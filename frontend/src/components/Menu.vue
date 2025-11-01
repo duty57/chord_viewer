@@ -1,19 +1,34 @@
 ﻿<script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
+import {ref, onMounted, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {applyTheme, getStoredTheme, saveTheme} from "@/utils/theme_manager.ts";
 
 const router = useRouter()
 const route = useRoute()
 
 const tabs = [
-  { name: 'Chords', to: '/chords' },
-  { name: 'Favourite', to: '/favourite' },
-  { name: 'Learning', to: '/learning' }
+  {name: 'Chords', to: '/chords'},
+  {name: 'Favourite', to: '/favourite'},
+  {name: 'Learning', to: '/learning'}
 ]
+const isDark = ref<boolean>(getStoredTheme()) // Start with light theme
 
-function navigateTo(to: string) :void {
+function navigateTo(to: string): void {
   if (route.path !== to) router.push(to)
 }
 
+watch(isDark, (newValue) => {
+  applyTheme(newValue)
+  saveTheme(newValue)
+}, { immediate: true })
+
+onMounted(() => {
+  applyTheme(isDark.value)
+})
+
+function switchMode(): void {
+  isDark.value = !isDark.value
+}
 </script>
 
 <template>
@@ -30,7 +45,11 @@ function navigateTo(to: string) :void {
       </div>
     </div>
     <div class="profile">
-      <img src="/img/placeholder_profile_picture.jpg" alt="Profile" class="profile-img" />
+      <label for="theme-toggle" class="theme-toggle" @click="switchMode">
+        <span v-if="!isDark" class="light-icon">🌙</span>
+        <span v-else class="dark-icon">☀️</span>
+      </label>
+      <img src="/img/placeholder_profile_picture.jpg" alt="Profile" class="profile-img"/>
     </div>
   </nav>
 </template>
@@ -40,7 +59,7 @@ function navigateTo(to: string) :void {
   display: flex;
   height: 50px;
   justify-content: space-between;
-  align-items: stretch; /* allow children to fill navbar height */
+  align-items: stretch;
   background-color: var(--menu-bg);
   color: var(--menu-text);
   padding: 0rem 1.5rem;
@@ -57,7 +76,7 @@ function navigateTo(to: string) :void {
 .tab {
   display: flex;
   align-items: center;
-  height: 100%; /* fills navbar height because parent is stretched */
+  height: 100%;
   padding: 0 0.75rem;
   cursor: pointer;
   font-weight: 500;
@@ -71,7 +90,7 @@ function navigateTo(to: string) :void {
 }
 
 .tab.active {
-  background-color: var(--menu-active-bg, rgba(255,255,255,0.06));
+  background-color: var(--menu-hover);
   border-bottom-color: white;
   color: white;
 }
@@ -88,5 +107,27 @@ function navigateTo(to: string) :void {
   object-fit: cover;
   border: 2px solid white;
   cursor: pointer;
+}
+
+.theme-toggle {
+  position: relative;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+}
+
+.light-icon {
+  display: inline;
+}
+
+.dark-icon {
+  display: inline;
 }
 </style>

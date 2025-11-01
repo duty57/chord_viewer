@@ -1,54 +1,48 @@
-﻿
-@font-face {
-  font-family: "GreatVibes";
-  src: url("frontend/public/fonts/GreatVibes-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
+﻿@font-face {
+    font-family: "GreatVibes";
+    src: url("frontend/public/fonts/GreatVibes-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
 
-* {
-  margin: 0;
-}
+  * {
+    margin: 0;
+  }
 
-.theme-wrapper {
-  /* Light theme (default) */
-  --bg-primary: #f3f4f6;
-  --bg-secondary: #ffffff;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --border-color: #d1d5db;
-  --button-bg: #8e24aa;
-  --button-hover: #6a1b9a;
-  --menu-bg: #D81B60;
-  --menu-border: #FF4081;
-  --menu-hover: #C2185B;
-  --menu-text: #FCE4EC;
-  --error-color: #ef4444;
-}
+  .theme-wrapper {
+    /* Light theme (default) */
+    --bg-primary: #f3f4f6;
+    --bg-secondary: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #d1d5db;
+    --button-bg: #8e24aa;
+    --button-hover: #6a1b9a;
+    --menu-bg: #D81B60;
+    --menu-border: #FF4081;
+    --menu-hover: #C2185B;
+    --menu-text: #FCE4EC;
+    --error-color: #ef4444;
+  }
 
-.theme-checkbox {
-  display: none;
-}
+  body.dark-theme .theme-wrapper {
+    /* Dark theme */
+    --bg-primary: #1f2937;
+    --bg-secondary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --border-color: #4b5563;
+    --button-bg: #8e24aa;
+    --button-hover: #6a1b9a;
+    --menu-bg: #D81B60;
+    --menu-border: #FF4081;
+    --menu-hover: #C2185B;
+    --menu-text: #FCE4EC;
+    --error-color: #f87171;
+  }
 
-.theme-checkbox:checked ~ .container {
-  /* Dark theme */
-  --bg-primary: #1f2937;
-  --bg-secondary: #374151;
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --border-color: #4b5563;
-  --button-bg: #8e24aa;
-  --button-hover: #6a1b9a;
-  --menu-bg: #D81B60;
-  --menu-border: #FF4081;
-  --menu-hover: #C2185B;
-  --menu-text: #FCE4EC;
-  --error-color: #f87171;
-}
-
-
-.error {
-  color: var(--error-color);
-  margin-bottom: 1rem;
-  transition: color 0.3s ease;
-}
+  .error {
+    color: var(--error-color);
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+  }

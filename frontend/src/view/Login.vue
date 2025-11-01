@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
+import {applyTheme, getStoredTheme} from "@/utils/theme_manager.ts";
 
 const username = ref('')
 const password = ref('')
@@ -10,19 +11,20 @@ const router = useRouter()
 const login = () => {
   router.push("/home")
 }
+
+onMounted(() => {
+  const isDark = getStoredTheme()
+  applyTheme(isDark)
+})
+
 </script>
 
 <template>
   <div class="theme-wrapper">
-    <input type="checkbox" id="theme-toggle" class="theme-checkbox" />
     <div class="container">
       <div class="card">
         <div class="header">
           <h1>Login</h1>
-          <label for="theme-toggle" class="theme-toggle">
-            <span class="light-icon">🌙</span>
-            <span class="dark-icon">☀️</span>
-          </label>
         </div>
         <form @submit.prevent="login">
           <div class="form-group">
@@ -76,36 +78,6 @@ h1 {
   color: var(--text-primary);
   margin: 0;
   transition: color 0.3s ease;
-}
-
-.theme-toggle {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 8px;
-  background-color: var(--bg-primary);
-  cursor: pointer;
-  font-size: 1.25rem;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-}
-
-.light-icon {
-  display: inline;
-}
-
-.dark-icon {
-  display: none;
-}
-
-.theme-checkbox:checked ~ .container .light-icon {
-  display: none;
-}
-
-.theme-checkbox:checked ~ .container .dark-icon {
-  display: inline;
 }
 
 .form-group {
