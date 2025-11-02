@@ -22,6 +22,9 @@
     --menu-border: #FF4081;
     --menu-hover: #C2185B;
     --menu-text: #FCE4EC;
+    --selector-inactive: #BDBDBD;
+    --selector-active: #F48FB1;
+    --selector-text: #212121;
     --error-color: #ef4444;
   }
 
@@ -38,6 +41,9 @@
     --menu-border: #FF4081;
     --menu-hover: #C2185B;
     --menu-text: #FCE4EC;
+    --selector-inactive: #757575;
+    --selector-active: #F06292;
+    --selector-text: #fafafa;
     --error-color: #f87171;
   }
 
