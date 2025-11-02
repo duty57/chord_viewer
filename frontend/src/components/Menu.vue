@@ -7,6 +7,7 @@ const router = useRouter()
 const route = useRoute()
 
 const tabs = [
+  {name: 'Home', to: '/home'},
   {name: 'Chords', to: '/chords'},
   {name: 'Favourite', to: '/favourite'},
   {name: 'Learning', to: '/learning'}
@@ -65,11 +66,11 @@ function switchMode(): void {
   padding: 0rem 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid var(--menu-border);
+  user-select: none;
 }
 
 .tabs {
   display: flex;
-  gap: 1.5rem;
   align-items: stretch;
 }
 
@@ -77,7 +78,7 @@ function switchMode(): void {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 0.75rem;
+  padding: 0 2rem;
   cursor: pointer;
   font-weight: 500;
   transition: color 0.2s, background-color 0.2s, border-bottom 0.2s;
@@ -91,8 +92,8 @@ function switchMode(): void {
 
 .tab.active {
   background-color: var(--menu-hover);
-  border-bottom-color: white;
-  color: white;
+  border-bottom-color: var(--menu-border);
+  color: var(--menu-text);
 }
 
 .profile {
