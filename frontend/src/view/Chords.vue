@@ -3,6 +3,7 @@
 import Menu from "@/components/Menu.vue";
 import {computed, ref} from "vue";
 import {alterations, compounds, notes} from "@/stores/notes.ts";
+import {userInstance} from "@/models/user.ts";
 
 const columns = 18;
 const rows = 5;
@@ -24,6 +25,9 @@ const chordCombination = computed(() => {
   return selectedNote.value + selectedAlteration.value + selectedCompound.value;
 });
 
+let isFavourite = userInstance.getFavouriteChords().has(chordCombination.value);
+let isLearned = userInstance.getLearnedChords().has(chordCombination.value);
+
 function generateColumns() {
   const parts = [];
   for (let i = 0; i < columns; i++) {
@@ -42,6 +46,32 @@ function cellStyle(n: number) {
     borderTop: `${borderWidth}px solid #CFD8DC`,
     borderBottom: `${borderWidth}px solid #CFD8DC`,
   };
+}
+
+function toggleFavourite() {
+  const key = chordCombination.value;
+  const favourites = userInstance.getFavouriteChords();
+  if (!favourites) return;
+  if (favourites.has(key)) {
+    favourites.delete(key);
+    isFavourite = false;
+  } else {
+    favourites.add(key);
+    isFavourite = true;
+  }
+  userInstance.setFavouriteChords(favourites);
+}
+
+function toggleLearned() {
+  const key = chordCombination.value;
+  const learned = userInstance.getLearnedChords();
+  if (!learned) return;
+  if (learned.has(key)) {
+    learned.delete(key);
+  }else {
+    learned.add(key);
+  }
+  userInstance.setLearnedChords(learned);
 }
 
 </script>
@@ -74,6 +104,14 @@ function cellStyle(n: number) {
       <div class="compound-selector">
         <div class="compound" :class="{active: selectedCompound === compound.value}" v-for="compound in compounds" :key="compound.value" @click="selectedCompound = compound.value">{{compound.label}}</div>
       </div>
+    </div>
+    <div class="chord-management">
+      <button type="button" class="add-learn-btn" @click="toggleLearned" :class="{active: isLearned}">Learn</button>
+      <button type="button" class="add-fav-btn" @click="toggleFavourite" :aria-pressed="isFavourite">
+        <svg class="star" viewBox="0 0 24 24" width="24" height="24" :class="{active: isFavourite}">
+          <path d="M12 .587l3.668 7.431L23.5 9.75l-5.75 5.603L19.335 24 12 19.897 4.665 24l1.585-8.647L.5 9.75l7.832-1.732z" />
+        </svg>
+      </button>
     </div>
   </div>
 </template>
@@ -195,4 +233,45 @@ function cellStyle(n: number) {
   user-select: none;
 }
 
+.chord-management{
+  display: flex;
+  width: 20%;
+  margin: 0 30%;
+  justify-content: center;
+}
+
+.star {
+  fill: transparent;
+  stroke: #bdbdbd;
+  stroke-width: 1;
+  transition: fill .15s ease, stroke .15s ease;
+}
+.star.active {
+  fill: #FFD54F; /* yellow/gold */
+  stroke: #FFC107;
+}
+.add-fav-btn {
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+}
+
+.add-learn-btn {
+  background-color: var(--selector-inactive);
+  color: var(--selector-text);
+  box-shadow: none;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  cursor: pointer;
+}
+
+.add-learn-btn.active {
+  background-color: var(--selector-active);
+}
 </style>
