@@ -10,7 +10,6 @@
     this.password = password || '';
     this.token = tokenValue || '';
     this.favouriteChords = new Set<string>();
-    this.favouriteChords.add("C");
     this.learnedChords = new Set<string>();
   }
   setUser (email: string, password: string, token: string, favouriteChords: Set<string>, learnedChords: Set<string>) {

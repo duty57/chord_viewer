@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 
 import Menu from "@/components/Menu.vue";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {alterations, compounds, notes} from "@/stores/notes.ts";
 import {userInstance} from "@/models/user.ts";
 
@@ -16,7 +16,6 @@ const dotPositions = new Set([
   4 * columns + 11
 ]);
 
-
 const selectedNote = ref("C");
 const selectedAlteration = ref("");
 const selectedCompound = ref("");
@@ -25,8 +24,9 @@ const chordCombination = computed(() => {
   return selectedNote.value + selectedAlteration.value + selectedCompound.value;
 });
 
-let isFavourite = userInstance.getFavouriteChords().has(chordCombination.value);
-let isLearned = userInstance.getLearnedChords().has(chordCombination.value);
+const isFavourite = ref(false);
+const isLearned = ref(false);
+const learnButtonText = ref("Learn");
 
 function generateColumns() {
   const parts = [];
@@ -54,10 +54,10 @@ function toggleFavourite() {
   if (!favourites) return;
   if (favourites.has(key)) {
     favourites.delete(key);
-    isFavourite = false;
+    isFavourite.value = false;
   } else {
     favourites.add(key);
-    isFavourite = true;
+    isFavourite.value = true;
   }
   userInstance.setFavouriteChords(favourites);
 }
@@ -68,10 +68,42 @@ function toggleLearned() {
   if (!learned) return;
   if (learned.has(key)) {
     learned.delete(key);
+    isLearned.value = false;
+    learnButtonText.value = "Learn";
   }else {
     learned.add(key);
+    isLearned.value = true;
+    learnButtonText.value = "Learned";
   }
   userInstance.setLearnedChords(learned);
+  console.log(userInstance.getLearnedChords())
+}
+
+function checkUserChords() {
+  const fav = userInstance?.getFavouriteChords?.() ?? new Set<string>();
+  const learned = userInstance?.getLearnedChords?.() ?? new Set<string>();
+  isFavourite.value = fav.has(chordCombination.value);
+  isLearned.value = learned.has(chordCombination.value);
+  learnButtonText.value = (isLearned.value) ? "Learned" : "Learn";
+}
+
+onMounted(() => {
+  checkUserChords();
+})
+
+function selectNote(note: string) {
+  selectedNote.value = note;
+  checkUserChords();
+}
+
+function selectAlteration(alteration: string) {
+  selectedAlteration.value = alteration;
+  checkUserChords();
+}
+
+function selectCompound(compound: string) {
+  selectedCompound.value = compound;
+  checkUserChords();
 }
 
 </script>
@@ -96,18 +128,18 @@ function toggleLearned() {
 
     <div class="chord-selector">
       <div class="note-selector">
-        <div class="note" :class="{active: selectedNote === note.value}" v-for="note in notes" :key="note.value" @click="selectedNote = note.value">{{note.label}}</div>
+        <div class="note" :class="{active: selectedNote === note.value}" v-for="note in notes" :key="note.value" @click="selectNote(note.value)">{{note.label}}</div>
       </div>
       <div class="alteration-selector">
-        <div class="alteration" :class="{active: selectedAlteration === alteration.value}" v-for="alteration in alterations" :key="alteration.value" @click="selectedAlteration = alteration.value">{{alteration.label}}</div>
+        <div class="alteration" :class="{active: selectedAlteration === alteration.value}" v-for="alteration in alterations" :key="alteration.value" @click="selectAlteration(alteration.value)">{{alteration.label}}</div>
       </div>
       <div class="compound-selector">
-        <div class="compound" :class="{active: selectedCompound === compound.value}" v-for="compound in compounds" :key="compound.value" @click="selectedCompound = compound.value">{{compound.label}}</div>
+        <div class="compound" :class="{active: selectedCompound === compound.value}" v-for="compound in compounds" :key="compound.value" @click="selectCompound(compound.value)">{{compound.label}}</div>
       </div>
     </div>
     <div class="chord-management">
-      <button type="button" class="add-learn-btn" @click="toggleLearned" :class="{active: isLearned}">Learn</button>
-      <button type="button" class="add-fav-btn" @click="toggleFavourite" :aria-pressed="isFavourite">
+      <button type="button" class="add-learn-btn" @click="toggleLearned" :class="{active: isLearned}">{{learnButtonText}}</button>
+      <button type="button" class="add-fav-btn" @click="toggleFavourite">
         <svg class="star" viewBox="0 0 24 24" width="24" height="24" :class="{active: isFavourite}">
           <path d="M12 .587l3.668 7.431L23.5 9.75l-5.75 5.603L19.335 24 12 19.897 4.665 24l1.585-8.647L.5 9.75l7.832-1.732z" />
         </svg>
@@ -119,7 +151,6 @@ function toggleLearned() {
 <style scoped>
 
 .container {
-  min-height: 100vh;
   background-color: var(--bg-primary);
   width: 100%;
   display: flex;
