@@ -2,6 +2,7 @@
 
 import Menu from "@/components/Menu.vue";
 import {computed, ref} from "vue";
+import {alterations, compounds, notes} from "@/stores/notes.ts";
 
 const columns = 18;
 const rows = 5;
@@ -14,49 +15,6 @@ const dotPositions = new Set([
   4 * columns + 11
 ]);
 
-let notes = [
-  {label: "C", value: "C"},
-  {label: "C#", value: "C_"},
-  {label: "D", value: "D"},
-  {label: "D#", value: "D_"},
-  {label: "E", value: "E"},
-  {label: "F", value: "F"},
-  {label: "F#", value: "F_"},
-  {label: "G", value: "G"},
-  {label: "G#", value: "G_"},
-  {label: "A", value: "A"},
-  {label: "A#", value: "A_"},
-  {label: "B", value: "B"}
-]
-let alterations = [
-  {label: "Major", value: ""},
-  {label: "Minor", value: "m"},
-  {label: "7", value: "7"},
-  {label: "5", value: "5"},
-  {label: "dim", value: "dim"},
-  {label: "dim7", value: "dim7"},
-  {label: "aug", value: "aug"},
-  {label: "sus2", value: "sus2"},
-  {label: "sus4", value: "sus4"},
-  {label: "maj7", value: "maj7"},
-  {label: "m7", value: "m7"},
-  {label: "7sus4", value: "7sus4"}
-]
-let compounds = [
-  {label: "", value: ""},
-  {label: "C", value: "-C"},
-  {label: "C#", value: "-C_"},
-  {label: "D", value: "-D"},
-  {label: "D#", value: "-D_"},
-  {label: "E", value: "-E"},
-  {label: "F", value: "-F"},
-  {label: "F#", value: "-F_"},
-  {label: "G", value: "-G"},
-  {label: "G#", value: "-G_"},
-  {label: "A", value: "-A"},
-  {label: "A#", value: "-A_"},
-  {label: "B", value: "-B"}
-]
 
 const selectedNote = ref("C");
 const selectedAlteration = ref("");
@@ -91,6 +49,9 @@ function cellStyle(n: number) {
 <template>
   <Menu></Menu>
   <div class="container theme-wrapper">
+    <div class="fret-numeration" :style="{gridTemplateColumns: generateColumns()}">
+      <label v-for="n in columns" :key="'num-'+n" class="cell num">{{ n }}</label>
+    </div>
     <div class="fret-top" :style="{gridTemplateColumns: generateColumns()}">
       <div v-for="n in columns" :key="n" class="cell"></div>
     </div>
@@ -118,15 +79,6 @@ function cellStyle(n: number) {
 </template>
 
 <style scoped>
-.container {
-  min-height: 100vh;
-  background-color: var(--bg-primary);
-  width: 100%;
-  display: block;
-  align-items: center;
-  justify-content: flex-start;
-}
-
 
 .container {
   min-height: 100vh;
@@ -220,6 +172,27 @@ function cellStyle(n: number) {
 
 .note.active, .alteration.active, .compound.active {
   background-color: var(--selector-active);
+}
+
+.fret-numeration {
+  display: grid;
+  width: 80%;
+  margin-bottom: 6px;
+  grid-auto-rows: minmax(22px, auto);
+  justify-items: stretch;
+}
+
+.fret-numeration .cell {
+  background: transparent;
+  height: 22px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  user-select: none;
 }
 
 </style>
