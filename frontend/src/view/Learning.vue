@@ -11,7 +11,7 @@ const visibleNotes = computed(() =>
 
 <template>
   <Menu></Menu>
-  <div class="container theme-wrapper">
+  <div class="container">
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
         <label class="note-label">{{note.label}}</label>

@@ -110,7 +110,7 @@ function selectCompound(compound: string) {
 
 <template>
   <Menu></Menu>
-  <div class="container theme-wrapper">
+  <div class="container">
     <div class="fret-numeration" :style="{gridTemplateColumns: generateColumns()}">
       <label v-for="n in columns" :key="'num-'+n" class="cell num">{{ n }}</label>
     </div>

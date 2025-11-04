@@ -33,7 +33,7 @@ function switchMode(): void {
 </script>
 
 <template>
-  <nav class="navbar theme-wrapper">
+  <nav class="navbar">
     <div class="tabs">
       <div
         v-for="tab in tabs"
@@ -63,7 +63,7 @@ function switchMode(): void {
   align-items: stretch;
   background-color: var(--menu-bg);
   color: var(--menu-text);
-  padding: 0rem 1.5rem;
+  padding: 0 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid var(--menu-border);
   user-select: none;
