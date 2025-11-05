@@ -11,7 +11,7 @@ const visibleNotes = computed(() =>
 
 <template>
   <Menu></Menu>
-  <div class="container">
+  <div class="content">
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
         <label class="note-label">{{note.label}}</label>
@@ -25,15 +25,6 @@ const visibleNotes = computed(() =>
 </template>
 
 <style scoped>
-.container {
-  min-height: 100vh;
-  background-color: var(--bg-primary);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2.5% 0;
-}
 
 .progress-panel {
   width: 80%;

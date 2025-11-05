@@ -110,7 +110,7 @@ function selectCompound(compound: string) {
 
 <template>
   <Menu></Menu>
-  <div class="container">
+  <div class="content">
     <div class="fret-numeration" :style="{gridTemplateColumns: generateColumns()}">
       <label v-for="n in columns" :key="'num-'+n" class="cell num">{{ n }}</label>
     </div>
@@ -138,8 +138,8 @@ function selectCompound(compound: string) {
       </div>
     </div>
     <div class="chord-management">
-      <button type="button" class="add-learn-btn" @click="toggleLearned" :class="{active: isLearned}">{{learnButtonText}}</button>
-      <button type="button" class="add-fav-btn" @click="toggleFavourite">
+      <button type="button" class="txt-btn learn" @click="toggleLearned" :class="{active: isLearned}">{{learnButtonText}}</button>
+      <button type="button" class="empty-btn fav" @click="toggleFavourite">
         <svg class="star" viewBox="0 0 24 24" width="24" height="24" :class="{active: isFavourite}">
           <path d="M12 .587l3.668 7.431L23.5 9.75l-5.75 5.603L19.335 24 12 19.897 4.665 24l1.585-8.647L.5 9.75l7.832-1.732z" />
         </svg>
@@ -149,15 +149,6 @@ function selectCompound(compound: string) {
 </template>
 
 <style scoped>
-
-.container {
-  background-color: var(--bg-primary);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 5% 0;
-}
 
 .fret-top,
 .fret-bottom {
@@ -266,8 +257,8 @@ function selectCompound(compound: string) {
 
 .chord-management{
   display: flex;
-  width: 20%;
-  margin: 0 30%;
+  width: 15%;
+  margin: 0 42.5%;
   justify-content: center;
 }
 
@@ -277,32 +268,31 @@ function selectCompound(compound: string) {
   stroke-width: 1;
   transition: fill .15s ease, stroke .15s ease;
 }
+
+.star:hover {
+  fill: #FFD54F; /* yellow/gold */
+  stroke: #FFC107;
+}
+
 .star.active {
   fill: #FFD54F; /* yellow/gold */
   stroke: #FFC107;
 }
-.add-fav-btn {
-  background: transparent;
-  border: none;
-  padding: 0.25rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+
+.fav {
   margin-left: 1rem;
 }
 
-.add-learn-btn {
+.learn {
   background-color: var(--selector-inactive);
   color: var(--selector-text);
-  box-shadow: none;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 2rem;
-  cursor: pointer;
 }
 
-.add-learn-btn.active {
+.learn:hover {
+  background-color: var(--selector-active);
+}
+
+.learn.active {
   background-color: var(--selector-active);
 }
 </style>
