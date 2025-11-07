@@ -32,11 +32,11 @@
     return this.password;
   }
 
-  getFavouriteChords(): Set<string> | null {
+  getFavouriteChords(): Set<string> {
     return this.favouriteChords;
   }
 
-  getLearnedChords(): Set<string> | null {
+  getLearnedChords(): Set<string> {
     return this.learnedChords;
   }
 
