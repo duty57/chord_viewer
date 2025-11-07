@@ -4,6 +4,12 @@ import Menu from "@/components/Menu.vue";
 import {computed, onMounted, ref} from "vue";
 import {alterations, compounds, notes} from "@/stores/notes.ts";
 import {userInstance} from "@/models/user.ts";
+import {
+  addToFavourite,
+  addToLearned,
+  removeFromFavourite,
+  removeFromLearned
+} from "@/utils/chord_manager.ts";
 
 const columns = 18;
 const rows = 5;
@@ -26,7 +32,6 @@ const chordCombination = computed(() => {
 
 const isFavourite = ref(false);
 const isLearned = ref(false);
-const learnButtonText = ref("Learn");
 
 function generateColumns() {
   const parts = [];
@@ -53,13 +58,12 @@ function toggleFavourite() {
   const favourites = userInstance.getFavouriteChords();
   if (!favourites) return;
   if (favourites.has(key)) {
-    favourites.delete(key);
+    removeFromFavourite(favourites, key);
     isFavourite.value = false;
   } else {
-    favourites.add(key);
+    addToFavourite(favourites, key);
     isFavourite.value = true;
   }
-  userInstance.setFavouriteChords(favourites);
 }
 
 function toggleLearned() {
@@ -67,16 +71,12 @@ function toggleLearned() {
   const learned = userInstance.getLearnedChords();
   if (!learned) return;
   if (learned.has(key)) {
-    learned.delete(key);
+    removeFromLearned(learned, key);
     isLearned.value = false;
-    learnButtonText.value = "Learn";
   }else {
-    learned.add(key);
+    addToLearned(learned, key);
     isLearned.value = true;
-    learnButtonText.value = "Learned";
   }
-  userInstance.setLearnedChords(learned);
-  console.log(userInstance.getLearnedChords())
 }
 
 function checkUserChords() {
@@ -84,7 +84,6 @@ function checkUserChords() {
   const learned = userInstance?.getLearnedChords?.() ?? new Set<string>();
   isFavourite.value = fav.has(chordCombination.value);
   isLearned.value = learned.has(chordCombination.value);
-  learnButtonText.value = (isLearned.value) ? "Learned" : "Learn";
 }
 
 onMounted(() => {
@@ -138,7 +137,7 @@ function selectCompound(compound: string) {
       </div>
     </div>
     <div class="chord-management">
-      <button type="button" class="txt-btn learn" @click="toggleLearned" :class="{active: isLearned}">{{learnButtonText}}</button>
+      <button type="button" class="txt-btn learn" @click="toggleLearned" :class="{active: isLearned}">{{(isLearned)? "Learned" : "Learn"}}</button>
       <button type="button" class="empty-btn fav" @click="toggleFavourite">
         <svg class="star" viewBox="0 0 24 24" width="24" height="24" :class="{active: isFavourite}">
           <path d="M12 .587l3.668 7.431L23.5 9.75l-5.75 5.603L19.335 24 12 19.897 4.665 24l1.585-8.647L.5 9.75l7.832-1.732z" />
