@@ -1,11 +1,37 @@
 ﻿<script setup lang="ts">
 import Menu from "@/components/Menu.vue";
 import {notes} from "@/stores/notes.ts";
-import {computed, unref} from "vue";
+import {computed, onActivated, onMounted, reactive, unref} from "vue";
+import {userInstance} from "@/models/user.ts";
 
 const visibleNotes = computed(() =>
   unref(notes).filter((n: any) => n.maxAmount > 0)
 );
+
+const progress = reactive<Record<string, number>>({
+  'C': 0,
+  'D': 0,
+  'E': 0,
+  'F': 0,
+  'G': 0,
+  'A': 0,
+  'B': 0
+});
+
+function calculateProgress() {
+
+  for (const key in progress) progress[key] = 0;
+
+  const learnedChords: Set<string> = userInstance.getLearnedChords();
+  for (const chord of learnedChords) {
+      progress[chord[0]] += 1;
+  }
+  console.log("good");
+}
+
+
+onMounted(() => calculateProgress())
+onActivated(() => calculateProgress())
 
 </script>
 
@@ -15,10 +41,10 @@ const visibleNotes = computed(() =>
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
         <label class="note-label">{{note.label}}</label>
-        <label class="progress-values">{{`${note.currentProgress}/${note.maxAmount}`}}</label>
+        <label class="progress-values">{{`${progress[note.label]}/${note.maxAmount}`}}</label>
       </div>
       <div class="progress-bar-bg" >
-        <span class="progress-bar" :style="{backgroundColor: note.color, width: note.currentProgress / note.maxAmount * 100 + '%'}"></span>
+        <span class="progress-bar" :style="{backgroundColor: note.color, width: progress[note.label] / note.maxAmount * 100 + '%'}"></span>
       </div>
     </div>
   </div>

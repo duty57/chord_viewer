@@ -1,16 +1,16 @@
 ﻿export let notes = [
-  {label: "C", value: "C", maxAmount: 1512, currentProgress: 512, color: "#28ff01"},
-  {label: "C#", value: "C_", maxAmount: 0, currentProgress: 0, color: "#00ffe9"},
-  {label: "D", value: "D", maxAmount: 2268, currentProgress: 0, color: "#007dfe"},
-  {label: "D#", value: "D_", maxAmount: 0, currentProgress: 0, color: "#0600fe"},
-  {label: "E", value: "E", maxAmount: 1512, currentProgress: 0, color: "#4400e9"},
-  {label: "F", value: "F", maxAmount: 1512, currentProgress: 0, color: "#57009d"},
-  {label: "F#", value: "F_", maxAmount: 0, currentProgress: 0, color: "#740000"},
-  {label: "G", value: "G", maxAmount: 2268, currentProgress: 0, color: "#b30101"},
-  {label: "G#", value: "G_", maxAmount: 0, currentProgress: 0, color: "#ee0000"},
-  {label: "A", value: "A", maxAmount: 2268, currentProgress: 0, color: "#ff6300"},
-  {label: "A#", value: "A_", maxAmount: 0, currentProgress: 0, color: "#ffed02"},
-  {label: "B", value: "B", maxAmount: 1512, currentProgress: 0, color: "#99fe00"}
+  {label: "C", value: "C", maxAmount: 1512, color: "#28ff01"},
+  {label: "C#", value: "C_", maxAmount: 0, color: "#00ffe9"},
+  {label: "D", value: "D", maxAmount: 2268, color: "#007dfe"},
+  {label: "D#", value: "D_", maxAmount: 0, color: "#0600fe"},
+  {label: "E", value: "E", maxAmount: 1512, color: "#4400e9"},
+  {label: "F", value: "F", maxAmount: 1512, color: "#57009d"},
+  {label: "F#", value: "F_", maxAmount: 0, color: "#740000"},
+  {label: "G", value: "G", maxAmount: 2268, color: "#b30101"},
+  {label: "G#", value: "G_", maxAmount: 0, color: "#ee0000"},
+  {label: "A", value: "A", maxAmount: 2268, color: "#ff6300"},
+  {label: "A#", value: "A_", maxAmount: 0, color: "#ffed02"},
+  {label: "B", value: "B", maxAmount: 1512, color: "#99fe00"}
 ]
 export const alterations = [
   {label: "Major", value: ""},
