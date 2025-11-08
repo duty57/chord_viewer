@@ -44,6 +44,10 @@ func RegisterRoutes(router *gin.Engine) {
 	{
 		api.POST("/login", loginHandler)
 		api.POST("/register", registerHandler)
+		api.POST("/favChord", addFavouriteChordHandler)
+		api.POST("/learnedChord", addLearnedChordHandler)
+		api.DELETE("/favChord", deleteFavouriteChordHandler)
+		api.DELETE("/learnedChord", deleteLearnedChordHandler)
 	}
 }
 func loginHandler(c *gin.Context) {
@@ -102,10 +106,12 @@ func loginHandler(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": "logged_in",
-		"uid":    token.UID,
-		"email":  body.Email,
-		"admin":  user.Admin,
+		"status":          "logged_in",
+		"uid":             token.UID,
+		"email":           body.Email,
+		"admin":           user.Admin,
+		"favouriteChords": user.FavouriteChords,
+		"learnedChords":   user.LearnedChords,
 	})
 }
 
@@ -140,8 +146,10 @@ func registerHandler(c *gin.Context) {
 
 	// Create new user document
 	newUser := types.User{
-		Email: body.Email,
-		Admin: false, // Default to non-admin
+		Email:           body.Email,
+		Admin:           false, // Default to non-admin
+		FavouriteChords: make([]string, 0),
+		LearnedChords:   make([]string, 0),
 	}
 
 	_, err = firestoreClient.Collection("users").Doc(token.UID).Set(c, newUser)
@@ -167,10 +175,12 @@ func registerHandler(c *gin.Context) {
 		true,
 	)
 	c.JSON(http.StatusCreated, gin.H{
-		"status": "user created",
-		"uid":    token.UID,
-		"email":  newUser.Email,
-		"admin":  newUser.Admin,
+		"status":          "user created",
+		"uid":             token.UID,
+		"email":           newUser.Email,
+		"admin":           newUser.Admin,
+		"favouriteChords": newUser.FavouriteChords,
+		"learnedChords":   newUser.LearnedChords,
 	})
 }
 

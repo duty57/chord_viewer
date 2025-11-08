@@ -1,21 +1,25 @@
-﻿
+﻿import {
+  addToFavouriteAPI,
+  addToLearnedAPI,
+  deleteFromFavouriteAPI,
+  deleteFromLearnedAPI
+} from "@/api/chord_api.ts";
+
 export function removeFromFavourite(chords: Set<string>, key: string) : void {
-  chords.delete(key);
+  deleteFromFavouriteAPI(key).then(r => chords.delete(key));
   //add api calls
 }
 
 export function addToFavourite(chords: Set<string>, key: string) : void {
-  chords.add(key);
+  addToFavouriteAPI(key).then(r => chords.add(key));
   //add api calls
 }
 
 export function removeFromLearned(chords: Set<string>, key: string) : void {
-  chords.delete(key);
-  //add api calls
-
+  deleteFromLearnedAPI(key).then(r => chords.delete(key));
 }
 
 export function addToLearned(chords: Set<string>, key: string) : void {
-  chords.add(key);
+  addToLearnedAPI(key).then(r => chords.add(key));
   //add api calls
 }
