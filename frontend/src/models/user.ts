@@ -1,9 +1,11 @@
-﻿export class User {
+﻿import {reactive} from "vue";
+
+export class User {
   private email: string;
   private password: string;
   private token: string;
-  private favouriteChords: Set<string>;
-  private learnedChords: Set<string>;
+  private favouriteChords = reactive(new Set<string>());
+  private learnedChords = reactive(new Set<string>());
 
   constructor(email?: string, password?: string, tokenValue?: string) {
     this.email = email || '';
@@ -12,12 +14,10 @@
     this.favouriteChords = new Set<string>();
     this.learnedChords = new Set<string>();
   }
-  setUser (email: string, password: string, token: string, favouriteChords: Set<string>, learnedChords: Set<string>) {
+  setUser (email: string, password: string, token: string) {
     this.email = email;
     this.password = password;
     this.token = token;
-    this.favouriteChords = favouriteChords;
-    this.learnedChords = learnedChords;
   }
 
   getAuthToken(): string | null {
@@ -48,4 +48,4 @@
     this.learnedChords = learnedChords;
   }
 }
-export const userInstance = new User();
+export const userInstance = reactive<User>(new User());

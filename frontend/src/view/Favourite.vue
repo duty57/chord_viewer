@@ -4,14 +4,12 @@ import Menu from "@/components/Menu.vue";
 import {userInstance} from "@/models/user.ts";
 import Divider from "@/components/Divider.vue";
 import {removeFromFavourite} from "@/utils/chord_manager.ts";
-import {ref} from "vue";
 
-const favouriteChords = ref(userInstance.getFavouriteChords());
+const favouriteChords = userInstance.getFavouriteChords();
 
 function handleRemove(chord: string) {
-  removeFromFavourite(favouriteChords.value, chord);
+  removeFromFavourite(favouriteChords, chord);
   // Re-fetch the updated list
-  favouriteChords.value = userInstance.getFavouriteChords();
 }
 
 </script>
