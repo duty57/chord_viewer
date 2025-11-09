@@ -2,6 +2,7 @@ package api
 
 import (
 	"chordViewer/types"
+	"chordViewer/utils"
 	"cloud.google.com/go/firestore"
 	"context"
 	firebase "firebase.google.com/go"
@@ -42,26 +43,25 @@ func RegisterRoutes(router *gin.Engine) {
 
 	api := router.Group("/api")
 	{
+		api.GET("/me", meHandler)
 		api.POST("/login", loginHandler)
 		api.POST("/register", registerHandler)
 		api.POST("/favChord", addFavouriteChordHandler)
 		api.POST("/learnedChord", addLearnedChordHandler)
 		api.DELETE("/favChord", deleteFavouriteChordHandler)
 		api.DELETE("/learnedChord", deleteLearnedChordHandler)
+		api.GET("/chord", chordHandler)
 	}
 }
 func loginHandler(c *gin.Context) {
 
-	idToken := c.GetHeader("Authorization") //get token
-	if idToken == "" || len(idToken) < 7 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing Authorization header"})
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
 
-	idToken = idToken[7:]
-	token, err := authClient.VerifyIDToken(c, idToken) //verify token
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid ID token"})
 		return
 	}
 
@@ -88,22 +88,11 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	cookieDuration := time.Hour * 24
-	sessionCookie, err := authClient.SessionCookie(context.Background(), idToken, cookieDuration)
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
 	}
-
-	c.SetCookie(
-		"session",
-		sessionCookie,
-		int(cookieDuration),
-		"/",
-		"localhost",
-		false,
-		true,
-	)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":          "logged_in",
@@ -117,16 +106,13 @@ func loginHandler(c *gin.Context) {
 
 func registerHandler(c *gin.Context) {
 
-	idToken := c.GetHeader("Authorization")
-	if idToken == "" || len(idToken) < 7 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing Authorization header"})
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
 
-	idToken = idToken[7:]
-	token, err := authClient.VerifyIDToken(c, idToken)
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid ID token"})
 		return
 	}
 
@@ -158,30 +144,64 @@ func registerHandler(c *gin.Context) {
 		return
 	}
 
-	cookieDuration := time.Hour * 24
-	sessionCookie, err := authClient.SessionCookie(context.Background(), idToken, cookieDuration)
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
 	}
 
-	c.SetCookie(
-		"session",
-		sessionCookie,
-		int(cookieDuration),
-		"/",
-		"localhost",
-		false,
-		true,
-	)
 	c.JSON(http.StatusCreated, gin.H{
-		"status":          "user created",
+		"status":          "user_created",
 		"uid":             token.UID,
 		"email":           newUser.Email,
 		"admin":           newUser.Admin,
 		"favouriteChords": newUser.FavouriteChords,
 		"learnedChords":   newUser.LearnedChords,
 	})
+}
+
+func meHandler(c *gin.Context) {
+
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
+		return
+	}
+
+	token, err := utils.VerifySession(c, authClient, idToken)
+	if err != nil {
+		fmt.Errorf("invalid TOKEEN")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
+		return
+	}
+
+	docRef := firestoreClient.Collection("users").Doc(token.UID)
+	docSnap, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user types.User
+	if err := docSnap.DataTo(&user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user data"})
+		return
+	}
+
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":          "user_data_parsed",
+		"uid":             token.UID,
+		"email":           user.Email,
+		"admin":           user.Admin,
+		"favouriteChords": user.FavouriteChords,
+		"learnedChords":   user.LearnedChords,
+	})
+
 }
 
 func setupCORS(router *gin.Engine) {

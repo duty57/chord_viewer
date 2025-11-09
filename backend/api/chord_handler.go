@@ -1,23 +1,22 @@
 package api
 
 import (
+	"chordViewer/utils"
 	"cloud.google.com/go/firestore"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 func addFavouriteChordHandler(c *gin.Context) {
 
-	//check the cookie
-	cookie, err := c.Cookie("session")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
-	ctx := context.Background()
-	//get the token
-	token, err := authClient.VerifySessionCookie(ctx, cookie)
+
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
 		return
@@ -35,7 +34,7 @@ func addFavouriteChordHandler(c *gin.Context) {
 
 	//add chord to the firestore
 	docRef := firestoreClient.Collection("users").Doc(token.UID)
-	_, err = docRef.Update(ctx, []firestore.Update{
+	_, err = docRef.Update(context.Background(), []firestore.Update{
 		{
 			Path:  "FavouriteChords",
 			Value: firestore.ArrayUnion(req.Chord),
@@ -43,6 +42,12 @@ func addFavouriteChordHandler(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
 	}
 
@@ -55,15 +60,12 @@ func addFavouriteChordHandler(c *gin.Context) {
 
 func addLearnedChordHandler(c *gin.Context) {
 
-	//check the cookie
-	cookie, err := c.Cookie("session")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
-	ctx := context.Background()
-	//get the token
-	token, err := authClient.VerifySessionCookie(ctx, cookie)
+
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
 		return
@@ -81,7 +83,7 @@ func addLearnedChordHandler(c *gin.Context) {
 
 	//add chord to the firestore
 	docRef := firestoreClient.Collection("users").Doc(token.UID)
-	_, err = docRef.Update(ctx, []firestore.Update{
+	_, err = docRef.Update(context.Background(), []firestore.Update{
 		{
 			Path:  "LearnedChords",
 			Value: firestore.ArrayUnion(req.Chord),
@@ -89,6 +91,12 @@ func addLearnedChordHandler(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
 	}
 
@@ -100,15 +108,13 @@ func addLearnedChordHandler(c *gin.Context) {
 }
 
 func deleteFavouriteChordHandler(c *gin.Context) {
-	//check the cookie
-	cookie, err := c.Cookie("session")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
+
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
-	ctx := context.Background()
-	//get the token
-	token, err := authClient.VerifySessionCookie(ctx, cookie)
+
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
 		return
@@ -126,7 +132,7 @@ func deleteFavouriteChordHandler(c *gin.Context) {
 
 	//add chord to the firestore
 	docRef := firestoreClient.Collection("users").Doc(token.UID)
-	_, err = docRef.Update(ctx, []firestore.Update{
+	_, err = docRef.Update(context.Background(), []firestore.Update{
 		{
 			Path:  "FavouriteChords",
 			Value: firestore.ArrayRemove(req.Chord),
@@ -134,6 +140,12 @@ func deleteFavouriteChordHandler(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
 	}
 
@@ -146,15 +158,12 @@ func deleteFavouriteChordHandler(c *gin.Context) {
 
 func deleteLearnedChordHandler(c *gin.Context) {
 
-	//check the cookie
-	cookie, err := c.Cookie("session")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
 		return
 	}
-	ctx := context.Background()
-	//get the token
-	token, err := authClient.VerifySessionCookie(ctx, cookie)
+
+	token, err := utils.VerifySession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
 		return
@@ -172,7 +181,7 @@ func deleteLearnedChordHandler(c *gin.Context) {
 
 	//add chord to the firestore
 	docRef := firestoreClient.Collection("users").Doc(token.UID)
-	_, err = docRef.Update(ctx, []firestore.Update{
+	_, err = docRef.Update(context.Background(), []firestore.Update{
 		{
 			Path:  "LearnedChords",
 			Value: firestore.ArrayRemove(req.Chord),
@@ -183,9 +192,31 @@ func deleteLearnedChordHandler(c *gin.Context) {
 		return
 	}
 
+	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Chord added to learned",
 		"uid":     token.UID,
 		"chord":   req.Chord,
 	})
+}
+
+func chordHandler(c *gin.Context) {
+	////check the cookie
+	//idToken, err := c.Cookie("session")
+	//if err != nil {
+	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
+	//	return
+	//}
+	//ctx := context.Background()
+	////get the token
+	//token, err := authClient.VerifySessionCookie(ctx, cookie)
+	//if err != nil {
+	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
+	//	return
+	//}
 }
