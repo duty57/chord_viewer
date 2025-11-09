@@ -1,5 +1,7 @@
 ﻿import {User} from "@/models/user.ts";
 import axios from "axios";
+import {signInWithEmailAndPassword} from "firebase/auth";
+import {auth} from "@/config/firebase.ts";
 
 export async function loginAPI(user: User) {
   const token = user.getAuthToken();
@@ -13,7 +15,7 @@ export async function loginAPI(user: User) {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      withCredentials: true // if backend sets HttpOnly cookie
+       // if backend sets HttpOnly cookie
     });
     return res.data;
   } catch (err: any) {
@@ -34,11 +36,26 @@ export async function registerAPI(user: User) {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      withCredentials: true // if backend sets HttpOnly cookie
+       // if backend sets HttpOnly cookie
     });
     return res.data;
   } catch (err: any) {
     console.error("Login failed:", err.response?.data || err.message);
     return null;
+  }
+}
+
+export async function meAPI(token : string | undefined) {
+  console.log("TOOOKKEEN", token)
+  try {
+    const res = await axios.get("http://localhost:8081/api/me", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    return res.data;
+  }catch (err : any) {
+    console.log("No session", err);
+    return;
   }
 }

@@ -20,7 +20,8 @@ async function login() {
 
     const verification = await loginAPI(new User(email.value, password.value, token));
     if (verification) {
-      // userInstance.setUser(verification.data)
+      userInstance.setUser(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
+      console.log(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
       router.push("/home");
     } else {
       error.value = "Token verification failed.";
@@ -38,6 +39,7 @@ async function register() {
 
     const verification = await registerAPI(new User(email.value, password.value, token));
     if (verification) {
+      userInstance.setUser(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
       router.push("/home");
     } else {
       error.value = "Registration succeeded but verification failed.";
