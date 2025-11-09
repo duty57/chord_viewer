@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 
 import Menu from "@/components/Menu.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {alterations, compounds, notes} from "@/stores/notes.ts";
 import {userInstance} from "@/models/user.ts";
 import {
@@ -10,6 +10,7 @@ import {
   removeFromFavourite,
   removeFromLearned
 } from "@/utils/chord_manager.ts";
+import {auth} from "@/config/firebase.ts";
 
 const columns = 18;
 const rows = 5;
@@ -53,28 +54,30 @@ function cellStyle(n: number) {
   };
 }
 
-function toggleFavourite() {
+async function toggleFavourite() {
   const key = chordCombination.value;
   const favourites = userInstance.getFavouriteChords();
   if (!favourites) return;
+  const idToken = await auth.currentUser?.getIdToken(false);
   if (favourites.has(key)) {
-    removeFromFavourite(favourites, key);
+    await removeFromFavourite(favourites, key, idToken);
     isFavourite.value = false;
   } else {
-    addToFavourite(favourites, key);
+    await addToFavourite(favourites, key, idToken);
     isFavourite.value = true;
   }
 }
 
-function toggleLearned() {
+async function toggleLearned() {
   const key = chordCombination.value;
   const learned = userInstance.getLearnedChords();
   if (!learned) return;
+  const idToken = await auth.currentUser?.getIdToken(false);
   if (learned.has(key)) {
-    removeFromLearned(learned, key);
+    await removeFromLearned(learned, key, idToken);
     isLearned.value = false;
   }else {
-    addToLearned(learned, key);
+    await addToLearned(learned, key, idToken);
     isLearned.value = true;
   }
 }
@@ -87,8 +90,17 @@ function checkUserChords() {
 }
 
 onMounted(() => {
-  checkUserChords();
-})
+  setTimeout( () => {
+    checkUserChords();
+    }, 100);
+});
+watch(
+  () => [userInstance.getFavouriteChords() ,userInstance.getLearnedChords()],
+  () => {
+    checkUserChords();
+  },
+  {deep: true}
+)
 
 function selectNote(note: string) {
   selectedNote.value = note;

@@ -4,12 +4,13 @@ import Menu from "@/components/Menu.vue";
 import {userInstance} from "@/models/user.ts";
 import Divider from "@/components/Divider.vue";
 import {removeFromFavourite} from "@/utils/chord_manager.ts";
+import {auth} from "@/config/firebase.ts";
 
 const favouriteChords = userInstance.getFavouriteChords();
 
-function handleRemove(chord: string) {
-  removeFromFavourite(favouriteChords, chord);
-  // Re-fetch the updated list
+async function handleRemove(chord: string) {
+  const idToken = await auth.currentUser?.getIdToken(false);
+  await removeFromFavourite(favouriteChords, chord, idToken);
 }
 
 </script>

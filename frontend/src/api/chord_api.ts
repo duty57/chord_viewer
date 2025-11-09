@@ -1,28 +1,31 @@
 ﻿import axios from "axios";
 
 
-export async function addToFavouriteAPI(chord: string) {
+export async function addToFavouriteAPI(chord: string, token : string | undefined) {
   const userData = {
     chord: chord
   };
   try {
     const res = await axios.post("http://localhost:8081/api/favChord", userData, {
-      withCredentials: true
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
-
     return res.data;
   }catch (err: any) {
     return null;
   }
 }
 
-export async function addToLearnedAPI(chord: string) {
+export async function addToLearnedAPI(chord: string, token : string | undefined) {
   const userData = {
     chord: chord
   };
   try {
     const res = await axios.post("http://localhost:8081/api/learnedChord", userData, {
-      withCredentials: true
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
     return res.data
   }catch (err: any) {
@@ -30,31 +33,35 @@ export async function addToLearnedAPI(chord: string) {
   }
 }
 
-export async function deleteFromFavouriteAPI(chord: string) {
+export async function deleteFromFavouriteAPI(chord: string, token : string | undefined) {
   const userData = {
     chord: chord
   };
   try {
     const res = await axios.delete("http://localhost:8081/api/favChord", {
       data: userData,
-      withCredentials: true
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
-    return res;
+    return res.data;
   }catch (err : any) {
     return null;
   }
 }
 
-export async function deleteFromLearnedAPI(chord: string) {
+export async function deleteFromLearnedAPI(chord: string, token : string | undefined) {
   const userData = {
     chord: chord
   };
   try {
     const res = await axios.delete("http://localhost:8081/api/learnedChord", {
       data: userData,
-      withCredentials: true
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
-    return res;
+    return res.data;
   }catch (err : any) {
     return null;
   }

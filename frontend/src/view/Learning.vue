@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 import Menu from "@/components/Menu.vue";
 import {notes} from "@/stores/notes.ts";
-import {computed, onActivated, onMounted, reactive, unref} from "vue";
+import {computed, onMounted, reactive, unref, watch} from "vue";
 import {userInstance} from "@/models/user.ts";
 
 const visibleNotes = computed(() =>
@@ -30,8 +30,18 @@ function calculateProgress() {
 }
 
 
-onMounted(() => calculateProgress())
-onActivated(() => calculateProgress())
+onMounted(() => {
+  setTimeout(() => {
+    calculateProgress();
+  }, 100);
+});
+watch(
+  () => userInstance.getLearnedChords(),
+  () => {
+    calculateProgress();
+  },
+  {deep: true}
+)
 
 </script>
 
