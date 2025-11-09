@@ -3,7 +3,7 @@
 export class User {
   private email: string;
   private password: string;
-  private token: string;
+  private token: string | undefined;
   private favouriteChords = reactive(new Set<string>());
   private learnedChords = reactive(new Set<string>());
 
@@ -14,13 +14,15 @@ export class User {
     this.favouriteChords = new Set<string>();
     this.learnedChords = new Set<string>();
   }
-  setUser (email: string, password: string, token: string) {
+  setUser (email: string, password: string, token: string | undefined, favouriteChords: Array<string>, learnedChords: Array<string>) {
     this.email = email;
     this.password = password;
     this.token = token;
+    if (favouriteChords) favouriteChords.forEach(chord => this.favouriteChords.add(chord));
+    if (learnedChords) learnedChords.forEach(chord => this.learnedChords.add(chord));
   }
 
-  getAuthToken(): string | null {
+  getAuthToken(): string | undefined {
     return this.token;
   }
 
