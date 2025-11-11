@@ -1,6 +1,6 @@
 ﻿@font-face {
     font-family: "GreatVibes";
-    src: url("frontend/public/fonts/GreatVibes-Regular.ttf") format("truetype");
+    src: url("../../public/fonts/GreatVibes-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
   }
@@ -33,6 +33,11 @@
     --selector-active: #F48FB1;
     --selector-text: #212121;
     --error-color: #ef4444;
+
+    --fingering-1: #FF8A65;
+    --fingering-2: #00E5FF;
+    --fingering-3: #00E676;
+    --fingering-4: #FFEB3B;
   }
 
   body.dark-theme .theme-wrapper {
@@ -52,6 +57,11 @@
     --selector-active: #F06292;
     --selector-text: #fafafa;
     --error-color: #f87171;
+
+    --fingering-1: #FF5252;
+    --fingering-2: #42A5F5;
+    --fingering-3: #66BB6A;
+    --fingering-4: #9575CD;
   }
 
   .error {
@@ -99,4 +109,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.great-vibes {
+  font-family: GreatVibes, monospace;
+  letter-spacing: 3px;
 }

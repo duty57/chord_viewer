@@ -14,21 +14,15 @@ import {getChordPosition} from "@/api/chord_api.ts";
 import {Chord} from "@/models/chord.ts";
 
 const columns = 18;
-const rows = 5;
+const rows = 6;
 const minScale = 0.5;
 const maxScale = 1;
-const targetCols = [3, 5, 7, 9, 15, 17];
-const dotPositions = new Set([
-  ...targetCols.map(c => 2 * columns + c),
-  11,
-  4 * columns + 11
-]);
+const targetCols = new Set<number>([3, 5, 7, 9, 12, 15, 17]);
 
 const selectedNote = ref("C");
 const selectedAlteration = ref("");
 const selectedCompound = ref("");
 const selectedChord = ref<Chord>(new Chord());
-  // computed(() => new Chord(selectedNote.value + selectedAlteration.value + selectedCompound.value, [], []));
 
 const isFavourite = ref(false);
 const isLearned = ref(false);
@@ -43,14 +37,19 @@ function generateColumns() {
   return parts.join(' ');
 }
 
-function cellStyle(n: number) {
-  n = (n < columns) ? 0 : n;
-  const row = Math.floor((rows * columns - n) / columns + 1);
-  const borderWidth = row * .75; // or use a multiplier like row * 2
-  return {
-    borderTop: `${borderWidth}px solid #CFD8DC`,
-    borderBottom: `${borderWidth}px solid #CFD8DC`,
-  };
+function getFingerAtCell(column: number, row: number): number | null {
+  const fretNumber = column;
+  const stringIndex = row - 1;
+
+  if (!selectedChord.value.positions || selectedChord.value.positions.length === 0) {
+    return null;
+  }
+
+  if (Number(selectedChord.value.positions[stringIndex]) === fretNumber) {
+    return Number(selectedChord.value.fingerings?.[stringIndex]) ?? null;
+  }
+
+  return null;
 }
 
 async function toggleFavourite() {
@@ -125,7 +124,9 @@ async function selectAlteration(alteration: string) {
 async function selectCompound(compound: string) {
   selectedCompound.value = compound;
 }
-
+const filteredCompounds = computed(() => {
+  return compounds.filter(c =>  c.value.slice(1) !== selectedNote.value);
+});
 </script>
 
 <template>
@@ -134,16 +135,17 @@ async function selectCompound(compound: string) {
     <div class="fret-numeration" :style="{gridTemplateColumns: generateColumns()}">
       <label v-for="n in columns" :key="'num-'+n" class="cell num">{{ n }}</label>
     </div>
-    <div class="fret-top" :style="{gridTemplateColumns: generateColumns()}">
-      <div v-for="n in columns" :key="n" class="cell"></div>
-    </div>
+
     <div class="fret" :style="{gridTemplateColumns: generateColumns()}">
-      <div v-for="n in rows * columns" :key="n" class="cell" :style="cellStyle(n)">
-        <div v-if="dotPositions.has(n)" class="dot"></div>
+      <div class="fret-column" v-for="column in columns" :key="column">
+        <div class="cell" v-for="row in rows" :key="row">
+          <div class="string" :style="{height: rows - row + 1 + 'px'}"></div>
+          <div v-if="getFingerAtCell(column, row) !== null" class="finger-marker" :style="{backgroundColor: 'var(--fingering-' + getFingerAtCell(column, row) + ')'}">
+            {{ getFingerAtCell(column, row) }}
+          </div>
+        </div>
+        <div class="dot" v-if="targetCols.has(column)"></div>
       </div>
-    </div>
-    <div class="fret-bottom" :style="{gridTemplateColumns: generateColumns()}">
-      <div v-for="n in columns" :key="n" class="cell"></div>
     </div>
 
     <div class="chord-selector">
@@ -154,7 +156,7 @@ async function selectCompound(compound: string) {
         <div class="alteration" :class="{active: selectedAlteration === alteration.value}" v-for="alteration in alterations" :key="alteration.value" @click="selectAlteration(alteration.value)">{{alteration.label}}</div>
       </div>
       <div class="compound-selector">
-        <div class="compound" :class="{active: selectedCompound === compound.value}" v-for="compound in compounds" :key="compound.value" @click="selectCompound(compound.value)">{{compound.label}}</div>
+        <div class="compound" :class="{active: selectedCompound === compound.value}" v-for="compound in filteredCompounds" :key="compound.value" @click="selectCompound(compound.value)">{{compound.label}}</div>
       </div>
     </div>
     <div class="chord-management">
@@ -170,51 +172,64 @@ async function selectCompound(compound: string) {
 
 <style scoped>
 
-.fret-top,
-.fret-bottom {
-  display: grid;
-  width: 80%;
-  border-left: 2px solid #CFD8DC;
-}
-
-.fret-top .cell {
-  background-color: #4E342E;
-  height: 10px;
-  border: none;
-  border-right: 4px solid #90A4AE;
-}
-
-.fret-bottom .cell {
-  background-color: #4E342E;
-  height: 10px;
-  border: none;
-  border-right: 4px solid #90A4AE;
-}
-
 .fret {
   display: grid;
-  grid-template-rows: repeat(5, minmax(48px, 1fr));
   width: 80%;
-  border: 1px solid #CFD8DC;
-  border-top: 3px solid #CFD8DC;
+  border-left: 3px solid #90A4AE;
 }
 
-.cell {
-  background-color: #4E342E;
-  border: 1px solid #90A4AE;
-  border-right: 3px solid #90A4AE;
+.fret-column {
   display: flex;
-  justify-content: center;
-  align-items: center;
-
+  flex-direction: column;
+  border-right: 3px solid #90A4AE;
+  position: relative;
 }
 
 .dot {
   width: 25px;
   height: 25px;
-  border-radius: 50%;
   background-color: #FFECB3;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+  border-radius: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cell {
+  background-color: #4E342E;
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.string {
+  width: 100%;
+  background-color: #BDBDBD;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.finger-marker {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  border: 1px solid white;
+  position: absolute;
 }
 
 .chord-selector {
