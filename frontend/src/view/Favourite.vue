@@ -5,7 +5,7 @@ import {userInstance} from "@/models/user.ts";
 import Divider from "@/components/Divider.vue";
 import {removeFromFavourite} from "@/utils/chord_manager.ts";
 
-const favouriteChords = userInstance.learnedChords;
+const favouriteChords = userInstance.favouriteChords;
 
 </script>
 
