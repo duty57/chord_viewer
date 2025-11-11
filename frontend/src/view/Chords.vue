@@ -10,7 +10,6 @@ import {
   removeFromFavourite,
   removeFromLearned
 } from "@/utils/chord_manager.ts";
-import {auth} from "@/config/firebase.ts";
 
 const columns = 18;
 const rows = 5;
@@ -58,12 +57,11 @@ async function toggleFavourite() {
   const key = chordCombination.value;
   const favourites = userInstance.getFavouriteChords();
   if (!favourites) return;
-  const idToken = await auth.currentUser?.getIdToken(false);
   if (favourites.has(key)) {
-    await removeFromFavourite(favourites, key, idToken);
+    await removeFromFavourite(favourites, key);
     isFavourite.value = false;
   } else {
-    await addToFavourite(favourites, key, idToken);
+    await addToFavourite(favourites, key);
     isFavourite.value = true;
   }
 }
@@ -72,12 +70,11 @@ async function toggleLearned() {
   const key = chordCombination.value;
   const learned = userInstance.getLearnedChords();
   if (!learned) return;
-  const idToken = await auth.currentUser?.getIdToken(false);
   if (learned.has(key)) {
-    await removeFromLearned(learned, key, idToken);
+    await removeFromLearned(learned, key);
     isLearned.value = false;
   }else {
-    await addToLearned(learned, key, idToken);
+    await addToLearned(learned, key);
     isLearned.value = true;
   }
 }

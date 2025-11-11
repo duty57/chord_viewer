@@ -1,21 +1,18 @@
 ﻿import {User} from "@/models/user.ts";
-import axios from "axios";
-import {signInWithEmailAndPassword} from "firebase/auth";
-import {auth} from "@/config/firebase.ts";
+import api from "@/config/firebase.ts";
 
 export async function loginAPI(user: User) {
   const token = user.getAuthToken();
   const userData = {
     email: user.getUserEmail(),
     password: user.getUserPassword(),
-    admin: false
-  }
+    admin: false,
+  };
   try {
-    const res = await axios.post("http://localhost:8081/api/login", userData, {
+    const res = await api.post("/login", userData, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-       // if backend sets HttpOnly cookie
     });
     return res.data;
   } catch (err: any) {
@@ -29,33 +26,27 @@ export async function registerAPI(user: User) {
   const userData = {
     email: user.getUserEmail(),
     password: user.getUserPassword(),
-    admin: false
-  }
+    admin: false,
+  };
   try {
-    const res = await axios.post("http://localhost:8081/api/register", userData, {
+    const res = await api.post("/register", userData, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-       // if backend sets HttpOnly cookie
     });
     return res.data;
   } catch (err: any) {
-    console.error("Login failed:", err.response?.data || err.message);
+    console.error("Registration failed:", err.response?.data || err.message);
     return null;
   }
 }
 
-export async function meAPI(token : string | undefined) {
-  console.log("TOOOKKEEN", token)
+export async function meAPI() {
   try {
-    const res = await axios.get("http://localhost:8081/api/me", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-    });
+    const res = await api.get("/me");
     return res.data;
-  }catch (err : any) {
+  } catch (err: any) {
     console.log("No session", err);
-    return;
+    return null;
   }
 }

@@ -1,65 +1,41 @@
-﻿import axios from "axios";
+﻿import api from "@/config/firebase.ts";
 
-
-export async function addToFavouriteAPI(chord: string, token : string | undefined) {
-  const userData = {
-    chord: chord
-  };
+export async function addToFavouriteAPI(chord: string) {
   try {
-    const res = await axios.post("http://localhost:8081/api/favChord", userData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const res = await api.post("/favChord", {chord});
     return res.data;
   }catch (err: any) {
     return null;
   }
 }
 
-export async function addToLearnedAPI(chord: string, token : string | undefined) {
-  const userData = {
-    chord: chord
-  };
+export async function addToLearnedAPI(chord: string) {
+
   try {
-    const res = await axios.post("http://localhost:8081/api/learnedChord", userData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const res = await api.post("/learnedChord", {chord});
     return res.data
   }catch (err: any) {
     return null;
   }
 }
 
-export async function deleteFromFavouriteAPI(chord: string, token : string | undefined) {
-  const userData = {
-    chord: chord
-  };
+export async function deleteFromFavouriteAPI(chord: string) {
   try {
-    const res = await axios.delete("http://localhost:8081/api/favChord", {
-      data: userData,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const res = await api.delete("/favChord", {
+    data: {
+      chord
+    }
+  });
     return res.data;
   }catch (err : any) {
     return null;
   }
 }
 
-export async function deleteFromLearnedAPI(chord: string, token : string | undefined) {
-  const userData = {
-    chord: chord
-  };
+export async function deleteFromLearnedAPI(chord: string) {
   try {
-    const res = await axios.delete("http://localhost:8081/api/learnedChord", {
-      data: userData,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    const res = await api.delete("/learnedChord", {
+      data: {chord}
     });
     return res.data;
   }catch (err : any) {

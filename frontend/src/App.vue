@@ -8,13 +8,11 @@ import { onAuthStateChanged } from "firebase/auth";
 
 onMounted( async () => {
   onAuthStateChanged(auth, async () => {
-    const idToken = await auth.currentUser?.getIdToken(false);
-    const res = await meAPI(idToken);
+    const res = await meAPI();
 
     if (res) {
-      userInstance.setUser(res.email, "", idToken, res.favouriteChords, res.learnedChords);
-      console.log(res.email, "", idToken, res.favouriteChords, res.learnedChords)
-      console.log(res.expires_in)
+      userInstance.setUser(res.email, "", "", res.favouriteChords, res.learnedChords);
+      console.log(res.email, "", "", res.favouriteChords, res.learnedChords)
     }
   });
 });

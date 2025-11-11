@@ -13,7 +13,6 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"net/http"
-	"time"
 )
 
 var authClient *auth.Client
@@ -24,34 +23,42 @@ func RegisterRoutes(router *gin.Engine) {
 	setupCORS(router)
 
 	opt := option.WithCredentialsFile("config/guitar-app-key.json")
-	app, err := firebase.NewApp(context.Background(), nil, opt)
+	ctx := context.Background()
+	app, err := firebase.NewApp(ctx, nil, opt)
 
 	if err != nil {
 		_ = fmt.Errorf("error initializing app: %v", err)
 		return
 	}
 
-	authClient, err = app.Auth(context.Background())
+	authClient, err = app.Auth(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	firestoreClient, err = app.Firestore(context.Background())
+	firestoreClient, err = app.Firestore(ctx)
 	if err != nil {
 		panic(err)
 	}
 
 	api := router.Group("/api")
 	{
-		api.GET("/me", meHandler)
 		api.POST("/login", loginHandler)
 		api.POST("/register", registerHandler)
-		api.POST("/favChord", addFavouriteChordHandler)
-		api.POST("/learnedChord", addLearnedChordHandler)
-		api.DELETE("/favChord", deleteFavouriteChordHandler)
-		api.DELETE("/learnedChord", deleteLearnedChordHandler)
-		api.GET("/chord", chordHandler)
+		api.POST("/refresh", refreshHandler)
+		api.POST("/logout", logoutHandler)
+
+		protected := api.Group("").Use(utils.AuthMiddleware(authClient))
+		{
+			protected.GET("/me", meHandler)
+			protected.POST("/favChord", addFavouriteChordHandler)
+			protected.POST("/learnedChord", addLearnedChordHandler)
+			protected.DELETE("/favChord", deleteFavouriteChordHandler)
+			protected.DELETE("/learnedChord", deleteLearnedChordHandler)
+			protected.GET("/chord", chordHandler)
+		}
 	}
+
 }
 func loginHandler(c *gin.Context) {
 
@@ -60,10 +67,8 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.VerifySession(c, authClient, idToken)
-	if err != nil {
-		return
-	}
+	ctx := context.Background()
+	token, err := authClient.VerifyIDToken(ctx, idToken)
 
 	var body types.User // get body
 	if err := c.BindJSON(&body); err != nil {
@@ -88,7 +93,7 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	err = utils.CreateSession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
@@ -111,10 +116,8 @@ func registerHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.VerifySession(c, authClient, idToken)
-	if err != nil {
-		return
-	}
+	ctx := context.Background()
+	token, err := authClient.VerifyIDToken(ctx, idToken)
 
 	var body types.User
 	if err := c.BindJSON(&body); err != nil {
@@ -144,7 +147,7 @@ func registerHandler(c *gin.Context) {
 		return
 	}
 
-	err = utils.CreateSession(authClient, idToken, time.Minute*30)
+	err = utils.CreateSession(c, authClient, idToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
 		return
@@ -162,17 +165,12 @@ func registerHandler(c *gin.Context) {
 
 func meHandler(c *gin.Context) {
 
-	idToken, success := utils.GetAuthHeader(c)
-	if !success {
+	tokenInterface, exists := c.Get("user_token")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-
-	token, err := utils.VerifySession(c, authClient, idToken)
-	if err != nil {
-		fmt.Errorf("invalid TOKEEN")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
-		return
-	}
+	token := tokenInterface.(*auth.Token)
 
 	docRef := firestoreClient.Collection("users").Doc(token.UID)
 	docSnap, err := docRef.Get(context.Background())
@@ -187,12 +185,6 @@ func meHandler(c *gin.Context) {
 		return
 	}
 
-	err = utils.CreateSession(authClient, idToken, time.Minute*30)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"status":          "user_data_parsed",
 		"uid":             token.UID,
@@ -201,7 +193,51 @@ func meHandler(c *gin.Context) {
 		"favouriteChords": user.FavouriteChords,
 		"learnedChords":   user.LearnedChords,
 	})
+}
 
+func refreshHandler(c *gin.Context) {
+	// Verify user still has valid refresh token
+	_, err := utils.VerifyRefreshToken(c, authClient)
+	if err != nil {
+		utils.ClearSession(c)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Refresh token expired, please login again",
+		})
+		return
+	}
+
+	// Get new Firebase ID token from header
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Missing Authorization header with new ID token",
+		})
+		return
+	}
+
+	// Verify new ID token
+	token, err := authClient.VerifyIDToken(context.Background(), idToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid ID token"})
+		return
+	}
+
+	// Create new session cookies
+	err = utils.CreateSession(c, authClient, idToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh session"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "tokens_refreshed",
+		"uid":    token.UID,
+	})
+}
+
+func logoutHandler(c *gin.Context) {
+	utils.ClearSession(c)
+	c.JSON(http.StatusOK, gin.H{"status": "logged_out"})
 }
 
 func setupCORS(router *gin.Engine) {
