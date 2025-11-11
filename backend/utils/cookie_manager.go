@@ -20,12 +20,12 @@ func GetAuthHeader(c *gin.Context) (string, bool) {
 }
 
 func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) error {
-	accessCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Minute*5)
+	accessCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Minute*15)
 	if err != nil {
 		return err
 	}
 
-	refreshCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Minute*6)
+	refreshCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Hour*24*14)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 	c.SetCookie(
 		"access_token",
 		accessCookie,
-		int((time.Minute * 5).Seconds()),
+		int((time.Minute * 15).Seconds()),
 		"/",
 		"localhost",
 		true,
@@ -43,7 +43,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 	c.SetCookie(
 		"refresh_token",
 		refreshCookie,
-		int((time.Minute * 6).Seconds()),
+		int((time.Hour * 24 * 14).Seconds()),
 		"/",
 		"localhost",
 		true,
