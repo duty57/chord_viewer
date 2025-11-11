@@ -11,6 +11,7 @@ import {
   removeFromLearned
 } from "@/utils/chord_manager.ts";
 import {getChordPosition} from "@/api/chord_api.ts";
+import {Chord} from "@/models/chord.ts";
 
 const columns = 18;
 const rows = 5;
@@ -26,10 +27,8 @@ const dotPositions = new Set([
 const selectedNote = ref("C");
 const selectedAlteration = ref("");
 const selectedCompound = ref("");
-
-const chordCombination = computed(() => {
-  return selectedNote.value + selectedAlteration.value + selectedCompound.value;
-});
+const selectedChord = ref<Chord>(new Chord());
+  // computed(() => new Chord(selectedNote.value + selectedAlteration.value + selectedCompound.value, [], []));
 
 const isFavourite = ref(false);
 const isLearned = ref(false);
@@ -55,7 +54,7 @@ function cellStyle(n: number) {
 }
 
 async function toggleFavourite() {
-  const key = chordCombination.value;
+  const key = selectedChord.value.chordName;
   const favourites = userInstance.favouriteChords;
   if (!favourites) return;
   if (favourites.has(key)) {
@@ -68,7 +67,7 @@ async function toggleFavourite() {
 }
 
 async function toggleLearned() {
-  const key = chordCombination.value;
+  const key = selectedChord.value.chordName;
   const learned = userInstance.learnedChords;
   if (!learned) return;
   if (learned.has(key)) {
@@ -83,10 +82,13 @@ async function toggleLearned() {
 async function checkUserChords() {
   const fav = userInstance?.favouriteChords ?? new Set<string>();
   const learned = userInstance?.learnedChords ?? new Set<string>();
-  isFavourite.value = fav.has(chordCombination.value);
-  isLearned.value = learned.has(chordCombination.value);
-  const res = await getChordPosition(chordCombination.value);
-  console.log(res);
+  isFavourite.value = fav.has(selectedChord.value.chordName);
+  isLearned.value = learned.has(selectedChord.value.chordName);
+  const res = await getChordPosition(selectedChord.value.chordName);
+  if (res) {
+    selectedChord.value = new Chord(res.chord, res.positions, res.fingerings);
+    console.log(selectedChord.value);
+  }
 }
 
 onMounted(() => {
@@ -102,19 +104,26 @@ watch(
   {deep: true}
 )
 
+watch(
+  () => [selectedNote.value, selectedAlteration.value, selectedCompound.value],
+  async () => {
+    const newChordName = selectedNote.value + selectedAlteration.value + selectedCompound.value;
+    selectedChord.value = new Chord(newChordName, [], []);
+    await checkUserChords();
+  },
+  {immediate: true}
+)
+
 async function selectNote(note: string) {
   selectedNote.value = note;
-  await checkUserChords();
 }
 
 async function selectAlteration(alteration: string) {
   selectedAlteration.value = alteration;
-  await checkUserChords();
 }
 
 async function selectCompound(compound: string) {
   selectedCompound.value = compound;
-  await checkUserChords();
 }
 
 </script>
