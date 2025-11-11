@@ -1,4 +1,4 @@
-﻿import api from "@/config/firebase.ts";
+﻿import {api, auth} from "@/config/firebase.ts";
 
 export async function addToFavouriteAPI(chord: string) {
   try {
@@ -36,6 +36,20 @@ export async function deleteFromLearnedAPI(chord: string) {
   try {
     const res = await api.delete("/learnedChord", {
       data: {chord}
+    });
+    return res.data;
+  }catch (err : any) {
+    return null;
+  }
+}
+
+export async function getChordPosition(chord: string) {
+  try {
+    const idToken = await auth.currentUser?.getIdToken(false);
+    const res = await api.get(`/chord?chord=${chord}`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`
+      }
     });
     return res.data;
   }catch (err : any) {

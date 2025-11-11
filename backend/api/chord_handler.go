@@ -1,9 +1,13 @@
 package api
 
 import (
+	"chordViewer/types"
+	"chordViewer/utils"
 	"cloud.google.com/go/firestore"
 	"context"
+	"encoding/json"
 	"firebase.google.com/go/auth"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -165,17 +169,42 @@ func deleteLearnedChordHandler(c *gin.Context) {
 }
 
 func chordHandler(c *gin.Context) {
-	////check the cookie
-	//idToken, err := c.Cookie("session")
-	//if err != nil {
-	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "No session cookie"})
-	//	return
-	//}
-	//ctx := context.Background()
-	////get the token
-	//token, err := authClient.VerifySessionCookie(ctx, cookie)
-	//if err != nil {
-	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired session"})
-	//	return
-	//}
+
+	idToken, success := utils.GetAuthHeader(c)
+	if !success {
+		return
+	}
+	chordName := c.Query("chord")
+
+	if chordName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Chord was not provided"})
+		return
+	}
+
+	url := fmt.Sprintf("https://guitar-app-b28eb-default-rtdb.europe-west1.firebasedatabase.app/%s.json?auth=%s", chordName, idToken)
+
+	response, err := http.Get(url)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Chord not found"})
+		return
+	}
+
+	var chordArray []types.Chord
+	if err := json.NewDecoder(response.Body).Decode(&chordArray); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"chord":      chordName,
+		"positions":  chordArray[0].Positions,
+		"fingerings": chordArray[0].Fingerings[0],
+	})
+
 }
