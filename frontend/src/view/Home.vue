@@ -5,7 +5,7 @@ import Divider from "@/components/Divider.vue";
 import {userInstance} from "@/models/user.ts";
 import {computed} from "vue";
 
-const latestLearnedChord = computed(() => new Set([...userInstance.getLearnedChords().values()].slice(-5).reverse()));
+const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords.values()].slice(-5).reverse()));
 
 </script>
 
@@ -16,11 +16,11 @@ const latestLearnedChord = computed(() => new Set([...userInstance.getLearnedCho
     <div class="stats">
       <div class="stats-card">
         <h2>Chords learned</h2>
-        <h1>{{ userInstance.getLearnedChords().size }}</h1>
+        <h1>{{ userInstance.learnedChords.size }}</h1>
       </div>
       <div class="stats-card">
         <h2>Favourite chords</h2>
-        <h1>{{userInstance.getFavouriteChords().size}}</h1>
+        <h1>{{userInstance.favouriteChords.size}}</h1>
       </div>
     </div>
     <Divider></Divider>

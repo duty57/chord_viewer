@@ -1,53 +1,45 @@
 ﻿import {reactive} from "vue";
 
 export class User {
-  private email: string;
-  private password: string;
-  private token: string | undefined;
-  private favouriteChords = reactive(new Set<string>());
-  private learnedChords = reactive(new Set<string>());
+  get token(): string | undefined {
+    return this._token;
+  }
+  get password(): string {
+    return this._password;
+  }
+  get email(): string {
+    return this._email;
+  }
+  get favouriteChords() {
+    return this._favouriteChords;
+  }
+
+  get learnedChords() {
+    return this._learnedChords;
+  }
+
+  private _email: string;
+  private _password: string;
+  private _token: string | undefined;
+  private _favouriteChords = reactive(new Set<string>());
+  private _learnedChords = reactive(new Set<string>());
 
   constructor(email?: string, password?: string, tokenValue?: string) {
-    this.email = email || '';
-    this.password = password || '';
-    this.token = tokenValue || '';
-    this.favouriteChords = new Set<string>();
-    this.learnedChords = new Set<string>();
+    this._email = email || '';
+    this._password = password || '';
+    this._token = tokenValue || '';
+    this._favouriteChords = new Set<string>();
+    this._learnedChords = new Set<string>();
   }
   setUser (email: string, password: string, token: string | undefined, favouriteChords: Array<string>, learnedChords: Array<string>) {
-    this.email = email;
-    this.password = password;
-    this.token = token;
-    if (favouriteChords) favouriteChords.forEach(chord => this.favouriteChords.add(chord));
-    if (learnedChords) learnedChords.forEach(chord => this.learnedChords.add(chord));
+    this._email = email;
+    this._password = password;
+    this._token = token;
+    if (favouriteChords) favouriteChords.forEach(chord => this._favouriteChords.add(chord));
+    if (learnedChords) learnedChords.forEach(chord => this._learnedChords.add(chord));
   }
 
-  getAuthToken(): string | undefined {
-    return this.token;
-  }
 
-  getUserEmail(): string | null {
-    return this.email;
-  }
 
-  getUserPassword(): string | null {
-    return this.password;
-  }
-
-  getFavouriteChords(): Set<string> {
-    return this.favouriteChords;
-  }
-
-  getLearnedChords(): Set<string> {
-    return this.learnedChords;
-  }
-
-  setFavouriteChords(favouriteChords : Set<string>) {
-    this.favouriteChords = favouriteChords;
-  }
-
-  setLearnedChords(learnedChords : Set<string>) {
-    this.learnedChords = learnedChords;
-  }
 }
 export const userInstance = reactive<User>(new User());

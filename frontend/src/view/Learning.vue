@@ -22,7 +22,7 @@ function calculateProgress() {
 
   for (const key in progress) progress[key] = 0;
 
-  const learnedChords: Set<string> = userInstance.getLearnedChords();
+  const learnedChords: Set<string> = userInstance.learnedChords;
   for (const chord of learnedChords) {
       progress[chord[0]] += 1;
   }
@@ -36,7 +36,7 @@ onMounted(() => {
   }, 100);
 });
 watch(
-  () => userInstance.getLearnedChords(),
+  () => userInstance.learnedChords,
   () => {
     calculateProgress();
   },

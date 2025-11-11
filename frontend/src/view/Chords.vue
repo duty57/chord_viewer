@@ -10,6 +10,7 @@ import {
   removeFromFavourite,
   removeFromLearned
 } from "@/utils/chord_manager.ts";
+import {getChordPosition} from "@/api/chord_api.ts";
 
 const columns = 18;
 const rows = 5;
@@ -55,7 +56,7 @@ function cellStyle(n: number) {
 
 async function toggleFavourite() {
   const key = chordCombination.value;
-  const favourites = userInstance.getFavouriteChords();
+  const favourites = userInstance.favouriteChords;
   if (!favourites) return;
   if (favourites.has(key)) {
     await removeFromFavourite(favourites, key);
@@ -68,7 +69,7 @@ async function toggleFavourite() {
 
 async function toggleLearned() {
   const key = chordCombination.value;
-  const learned = userInstance.getLearnedChords();
+  const learned = userInstance.learnedChords;
   if (!learned) return;
   if (learned.has(key)) {
     await removeFromLearned(learned, key);
@@ -79,39 +80,41 @@ async function toggleLearned() {
   }
 }
 
-function checkUserChords() {
-  const fav = userInstance?.getFavouriteChords?.() ?? new Set<string>();
-  const learned = userInstance?.getLearnedChords?.() ?? new Set<string>();
+async function checkUserChords() {
+  const fav = userInstance?.favouriteChords ?? new Set<string>();
+  const learned = userInstance?.learnedChords ?? new Set<string>();
   isFavourite.value = fav.has(chordCombination.value);
   isLearned.value = learned.has(chordCombination.value);
+  const res = await getChordPosition(chordCombination.value);
+  console.log(res);
 }
 
 onMounted(() => {
-  setTimeout( () => {
-    checkUserChords();
-    }, 100);
+  setTimeout( async () => {
+    await checkUserChords();
+  }, 100);
 });
 watch(
-  () => [userInstance.getFavouriteChords() ,userInstance.getLearnedChords()],
-  () => {
-    checkUserChords();
+  () => [userInstance.favouriteChords ,userInstance.learnedChords],
+  async () => {
+    await checkUserChords();
   },
   {deep: true}
 )
 
-function selectNote(note: string) {
+async function selectNote(note: string) {
   selectedNote.value = note;
-  checkUserChords();
+  await checkUserChords();
 }
 
-function selectAlteration(alteration: string) {
+async function selectAlteration(alteration: string) {
   selectedAlteration.value = alteration;
-  checkUserChords();
+  await checkUserChords();
 }
 
-function selectCompound(compound: string) {
+async function selectCompound(compound: string) {
   selectedCompound.value = compound;
-  checkUserChords();
+  await checkUserChords();
 }
 
 </script>
