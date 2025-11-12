@@ -94,12 +94,10 @@ async function getChordData() {
 onMounted(() => {
   const chord = route.query.chord as string;
   if (chord) {
-    console.log(chord);
     selectedChord.value = new Chord(chord, [], []);
     const match = chord.match(/^([A-G](?:_|b)?)([a-z0-9+]*)(?:-([A-G](?:_|b)?))?$/i);
     if (match) {
       const [_, note, alteration, compound] = match;
-      console.log(note, alteration, compound)
       selectNote(note || "C");
       const alterationObj = alterations.find(a => a.value === (alteration || ""));
       selectAlteration(alterationObj?.value || "");
