@@ -2,10 +2,10 @@
 import api from "@/config/firebase.ts";
 
 export async function loginAPI(user: User) {
-  const token = user.getAuthToken();
+  const token = user.token;
   const userData = {
-    email: user.getUserEmail(),
-    password: user.getUserPassword(),
+    email: user.email,
+    password: user.password,
     admin: false,
   };
   try {
@@ -22,10 +22,10 @@ export async function loginAPI(user: User) {
 }
 
 export async function registerAPI(user: User) {
-  const token = user.getAuthToken();
+  const token = user.token;
   const userData = {
-    email: user.getUserEmail(),
-    password: user.getUserPassword(),
+    email: user.email,
+    password: user.password,
     admin: false,
   };
   try {
