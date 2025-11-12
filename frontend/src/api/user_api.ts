@@ -50,3 +50,12 @@ export async function meAPI() {
     return null;
   }
 }
+
+export async function logoutAPI() {
+  try {
+    const res = await api.post("/logout");
+    return res.data;
+  } catch (err: any) {
+    return null;
+  }
+}

@@ -2,6 +2,9 @@
 import {ref, onMounted, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {applyTheme, getStoredTheme, saveTheme} from "@/utils/theme_manager.ts";
+import {auth} from "@/config/firebase.ts";
+import {signOut} from "firebase/auth";
+import {logoutAPI} from "@/api/user_api.ts";
 
 const router = useRouter()
 const route = useRoute()
@@ -12,7 +15,8 @@ const tabs = [
   {name: 'Favourite', to: '/favourite'},
   {name: 'Learning', to: '/learning'}
 ]
-const isDark = ref<boolean>(getStoredTheme()) // Start with light theme
+const isDark = ref<boolean>(getStoredTheme())
+const showProfileMenu = ref<boolean>(false)
 
 function navigateTo(to: string): void {
   if (route.path !== to) router.push(to)
@@ -29,6 +33,21 @@ onMounted(() => {
 
 function switchMode(): void {
   isDark.value = !isDark.value
+}
+
+function toggleProfileMenu(): void {
+  showProfileMenu.value = !showProfileMenu.value
+}
+
+async function logout(): Promise<void> {
+  try {
+    const res = await logoutAPI();
+    if (!res) console.log("LOGOUT ERROR");
+    await signOut(auth)
+    router.push('/')
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
 }
 </script>
 
@@ -50,7 +69,17 @@ function switchMode(): void {
         <span v-if="!isDark" class="light-icon">🌙</span>
         <span v-else class="dark-icon">☀️</span>
       </label>
-      <img src="/img/placeholder_profile_picture.jpg" alt="Profile" class="profile-img"/>
+      <div class="profile-container">
+        <img
+          src="/img/placeholder_profile_picture.jpg"
+          alt="Profile"
+          class="profile-img"
+          @click="toggleProfileMenu"
+        />
+        <div v-if="showProfileMenu" class="profile-menu">
+          <button class="logout-btn" @click="logout">Logout</button>
+        </div>
+      </div>
     </div>
   </nav>
 </template>
@@ -101,6 +130,10 @@ function switchMode(): void {
   align-items: center;
 }
 
+.profile-container {
+  position: relative;
+}
+
 .profile-img {
   width: 36px;
   height: 36px;
@@ -108,6 +141,41 @@ function switchMode(): void {
   object-fit: cover;
   border: 2px solid white;
   cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-img:hover {
+  opacity: 0.8;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--menu-text);
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-align: left;
+  transition: background-color 0.2s;
+  border-radius: 8px;
+
+}
+
+.logout-btn:hover {
+
+  background-color: var(--selector-active);
 }
 
 .theme-toggle {
