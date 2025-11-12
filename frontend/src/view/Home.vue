@@ -4,8 +4,17 @@ import Menu from "@/components/Menu.vue";
 import Divider from "@/components/Divider.vue";
 import {userInstance} from "@/models/user.ts";
 import {computed} from "vue";
+import {useRoute, useRouter} from 'vue-router'
 
+const router = useRouter();
 const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords.values()].slice(-5).reverse()));
+
+function navigateToChord(chordName: string) {
+  router.push({
+    path: "/chords",
+    query: {chord: chordName}
+  });
+}
 
 </script>
 
@@ -27,7 +36,7 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
     <div class="progress">
       <h1>Latest learned chords</h1>
       <div class="latest-learned">
-        <button v-for="chord in latestLearnedChord" class="card-btn chord-card">{{chord.replace('_', '#').replace('-', '/')}}</button>
+        <button v-for="chord in latestLearnedChord" class="card-btn chord-card" @click="navigateToChord(chord)">{{chord.replace('_', '#').replace('-', '/')}}</button>
       </div>
     </div>
   </div>

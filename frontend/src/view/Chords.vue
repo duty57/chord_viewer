@@ -12,6 +12,9 @@ import {
 } from "@/utils/chord_manager.ts";
 import {getChordPosition} from "@/api/chord_api.ts";
 import {Chord} from "@/models/chord.ts";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
 
 const columns = 18;
 const rows = 6;
@@ -23,7 +26,6 @@ const selectedNote = ref("C");
 const selectedAlteration = ref("");
 const selectedCompound = ref("");
 const selectedChord = ref<Chord>(new Chord());
-
 const isFavourite = ref(false);
 const isLearned = ref(false);
 
@@ -78,7 +80,7 @@ async function toggleLearned() {
   }
 }
 
-async function checkUserChords() {
+async function getChordData() {
   const fav = userInstance?.favouriteChords ?? new Set<string>();
   const learned = userInstance?.learnedChords ?? new Set<string>();
   isFavourite.value = fav.has(selectedChord.value.chordName);
@@ -86,41 +88,55 @@ async function checkUserChords() {
   const res = await getChordPosition(selectedChord.value.chordName);
   if (res) {
     selectedChord.value = new Chord(res.chord, res.positions, res.fingerings);
-    console.log(selectedChord.value);
   }
 }
 
 onMounted(() => {
+  const chord = route.query.chord as string;
+  if (chord) {
+    console.log(chord);
+    selectedChord.value = new Chord(chord, [], []);
+    const match = chord.match(/^([A-G](?:_|b)?)([a-z0-9+]*)(?:-([A-G](?:_|b)?))?$/i);
+    if (match) {
+      const [_, note, alteration, compound] = match;
+      console.log(note, alteration, compound)
+      selectNote(note || "C");
+      const alterationObj = alterations.find(a => a.value === (alteration || ""));
+      selectAlteration(alterationObj?.value || "");
+      const compoundObj = compounds.find(c => c.value === (compound ? `-${compound}` : ""));
+      selectCompound(compoundObj?.value || "");
+      getChordData();
+    }
+  }
   setTimeout( async () => {
-    await checkUserChords();
+    await getChordData();
   }, 100);
 });
+
 watch(
   () => [userInstance.favouriteChords ,userInstance.learnedChords],
   async () => {
-    await checkUserChords();
+    await getChordData();
   },
   {deep: true}
-)
+);
 
 watch(
   () => [selectedNote.value, selectedAlteration.value, selectedCompound.value],
   async () => {
     const newChordName = selectedNote.value + selectedAlteration.value + selectedCompound.value;
     selectedChord.value = new Chord(newChordName, [], []);
-    await checkUserChords();
+    await getChordData();
   },
   {immediate: true}
-)
+);
 
 async function selectNote(note: string) {
   selectedNote.value = note;
 }
-
 async function selectAlteration(alteration: string) {
   selectedAlteration.value = alteration;
 }
-
 async function selectCompound(compound: string) {
   selectedCompound.value = compound;
 }
