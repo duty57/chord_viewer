@@ -1,4 +1,5 @@
-﻿import {api, auth} from "@/config/firebase.ts";
+﻿import {auth} from "@/config/firebase.ts";
+import api from "@/config/api_config.ts";
 
 export async function addToFavouriteAPI(chord: string) {
   try {

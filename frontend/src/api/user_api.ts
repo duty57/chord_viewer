@@ -1,5 +1,5 @@
 ﻿import {User} from "@/models/user.ts";
-import api from "@/config/firebase.ts";
+import api from "@/config/api_config.ts";
 
 export async function loginAPI(user: User) {
   const token = user.token;
