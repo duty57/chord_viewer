@@ -77,4 +77,85 @@ const favouriteChords = userInstance.favouriteChords;
 .trash-btn:hover {
   background: #b91c1c;
 }
+
+@media (max-width: 1024px) {
+  .chords {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 80%;
+  }
+
+  .chord-name {
+    width: 70%;
+    font-size: 1rem;
+  }
+
+  .trash-btn {
+    width: 30%;
+  }
+}
+
+@media (max-width: 768px) {
+  .chords {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 80%;
+  }
+
+  .chord-name {
+    width: 70%;
+    font-size: 1rem;
+  }
+
+  .trash-btn {
+    width: 30%;
+  }
+}
+
+@media (max-width: 480px) {
+  .chords {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 80%;
+  }
+
+  .chord-name {
+    width: 70%;
+    font-size: 1rem;
+  }
+
+  .trash-btn {
+    width: 30%;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .chords {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 80%;
+  }
+
+  .chord-card {
+    min-height: 20vh;
+  }
+
+  .chord-name {
+    width: 70%;
+    font-size: 1rem;
+  }
+
+  .trash-btn {
+    width: 30%;
+  }
+}
+
 </style>

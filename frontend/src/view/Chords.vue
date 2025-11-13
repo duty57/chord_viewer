@@ -190,6 +190,7 @@ const filteredCompounds = computed(() => {
   display: grid;
   width: 80%;
   border-left: 3px solid #90A4AE;
+  overflow-x: auto;
 }
 
 .fret-column {
@@ -247,18 +248,9 @@ const filteredCompounds = computed(() => {
 }
 
 .chord-selector {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  align-items: center;
-}
-
-.chord-selector {
   display: block;
   width: 100%;
-  gap: 2rem;
   margin-top: 0;
-  justify-content: center;
 }
 
 .note-selector, .alteration-selector, .compound-selector {
@@ -266,10 +258,13 @@ const filteredCompounds = computed(() => {
   width: 80%;
   margin: 1.5% 10%;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .note, .alteration, .compound {
   flex: 1;
+  min-width: 50px;
   height: 50px;
   display: flex;
   justify-content: center;
@@ -277,6 +272,8 @@ const filteredCompounds = computed(() => {
   background-color: var(--selector-inactive);
   color: var(--selector-text);
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
 }
 
 .note.active, .alteration.active, .compound.active {
@@ -289,6 +286,7 @@ const filteredCompounds = computed(() => {
   margin-bottom: 6px;
   grid-auto-rows: minmax(22px, auto);
   justify-items: stretch;
+  overflow-x: auto;
 }
 
 .fret-numeration .cell {
@@ -306,9 +304,12 @@ const filteredCompounds = computed(() => {
 
 .chord-management{
   display: flex;
-  width: 15%;
-  margin: 0 42.5%;
+  width: 80%;
+  max-width: 400px;
+  margin: 2rem auto 0;
   justify-content: center;
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
 .star {
@@ -319,20 +320,21 @@ const filteredCompounds = computed(() => {
 }
 
 .star:hover {
-  fill: #FFD54F; /* yellow/gold */
+  fill: #FFD54F;
   stroke: #FFC107;
 }
 
 .star.active {
-  fill: #FFD54F; /* yellow/gold */
+  fill: #FFD54F;
   stroke: #FFC107;
 }
 
 .fav {
-  margin-left: 1rem;
+  margin-left: 0;
 }
 
 .learn {
+  flex: 1;
   background-color: var(--selector-inactive);
   color: var(--selector-text);
 }
@@ -344,4 +346,143 @@ const filteredCompounds = computed(() => {
 .learn.active {
   background-color: var(--selector-active);
 }
+
+@media (max-width: 1024px) {
+  .fret, .fret-numeration {
+    width: 90%;
+  }
+
+  .note-selector, .alteration-selector, .compound-selector {
+    width: 90%;
+    margin: 1.5% 5%;
+  }
+
+  .cell {
+    min-height: 40px;
+  }
+
+  .finger-marker {
+    width: 25px;
+    height: 25px;
+    font-size: 16px;
+  }
+
+  .dot {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem 0;
+  }
+
+  .fret, .fret-numeration {
+    width: 95%;
+  }
+
+  .note-selector, .alteration-selector, .compound-selector {
+    width: 95%;
+    margin: 1rem 2.5%;
+    gap: 0.25rem;
+  }
+
+  .note, .alteration, .compound {
+    min-width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .cell {
+    min-height: 35px;
+  }
+
+  .finger-marker {
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+  }
+
+  .dot {
+    width: 15px;
+    height: 15px;
+  }
+
+  .chord-management {
+    width: 90%;
+    flex-direction: column;
+    max-width: none;
+  }
+
+  .learn, .fav {
+    width: 100%;
+  }
+
+  .fav {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .fret-numeration .cell {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fret, .fret-numeration {
+    width: 98%;
+  }
+
+  .note-selector, .alteration-selector, .compound-selector {
+    width: 98%;
+    margin: 0.75rem 1%;
+  }
+
+  .note, .alteration, .compound {
+    min-width: 35px;
+    height: 35px;
+    font-size: 12px;
+    padding: 0.25rem;
+  }
+
+  .cell {
+    min-height: 30px;
+  }
+
+  .finger-marker {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+
+  .fret-numeration .cell {
+    font-size: 10px;
+  }
+
+  .chord-management {
+    width: 95%;
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .cell {
+    min-height: 30px;
+  }
+
+  .note, .alteration, .compound {
+    height: 35px;
+  }
+
+  .chord-selector {
+    margin-top: 0.5rem;
+  }
+
+  .note-selector, .alteration-selector, .compound-selector {
+    margin: 0.75rem 2.5%;
+  }
+}
+
 </style>

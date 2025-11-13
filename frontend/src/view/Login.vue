@@ -359,4 +359,103 @@ input:focus {
   margin: 0;
 }
 
+@media (max-width: 1024px) {
+  .card {
+    max-width: 60%;
+    padding: 2rem 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    max-width: 60%;
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  input,
+  .txt-btn {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  .github-icon,
+  .google-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    border-radius: 6px;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  input,
+  .txt-btn {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  label {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.9rem;
+  }
+
+  .reset-password {
+    font-size: 0.8rem;
+  }
+
+  .error,
+  .success {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  .github-icon,
+  .google-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .content {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    max-width: 500px;
+  }
+
+  input,
+  .txt-btn {
+    padding: 0.55rem;
+  }
+}
 </style>

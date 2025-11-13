@@ -44,13 +44,14 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
   width: 40%;
   margin: 2vh 30%;
   justify-content: space-between;
+  gap: 2rem;
 }
 
 .stats-card {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  margin-top: 5vh
+  margin-top: 5vh;
 }
 
 .stats-card h1 {
@@ -66,6 +67,7 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .progress h1 {
@@ -75,9 +77,11 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
 .latest-learned {
   display: flex;
   width: 80%;
-  margin: 5vh 10%;
-  justify-content: start;
+  margin: 7.5vh auto;
+  justify-content: center;
+  align-items: center;
   gap: 5%;
+  flex-wrap: wrap;
 }
 
 .chord-card {
@@ -92,6 +96,87 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
 
 .chord-card:hover {
   background-color: var(--button-hover);
+}
+
+@media (max-width: 1024px) {
+  .stats {
+    width: 60%;
+    margin: 2vh 20%;
+    gap: 1.5rem;
+  }
+
+  .stats-card h1 {
+    font-size: 40px;
+  }
+
+  .stats-card h2 {
+    display: flex;
+    justify-content: center;
+  }
+
+  .latest-learned {
+    width: 90%;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    margin: 7.5vh 0;
+  }
+
+  .chord-card {
+    width: 90%;
+    max-width: 400px;
+    height: 8vh;
+    min-height: 70px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats {
+    width: 80%;
+    margin: 2vh 10%;
+    flex-direction: column;
+  }
+
+  .stats-card h1 {
+    font-size: 36px;
+  }
+
+  .latest-learned {
+    width: 95%;
+    gap: 1rem;
+  }
+
+  .chord-card {
+    width: 95%;
+    max-width: 350px;
+    height: 7vh;
+    min-height: 60px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    width: 90%;
+    margin: 2vh 5%;
+  }
+
+  .stats-card h1 {
+    font-size: 32px;
+  }
+
+  .latest-learned {
+    width: 98%;
+  }
+
+  .chord-card {
+    width: 98%;
+    max-width: 300px;
+    height: 6vh;
+    min-height: 55px;
+    font-size: 18px;
+  }
 }
 
 </style>

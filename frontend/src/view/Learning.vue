@@ -65,9 +65,9 @@ watch(
 .progress-panel {
   width: 80%;
   margin: 0.5% 10%;
-  height: 100px;
+  height: 10vh;
   background-color: var(--bg-secondary);
-  border-radius: 25px;
+  border-radius: 2vh;
 }
 
 .progress-info {
@@ -103,4 +103,71 @@ watch(
   border-radius: 10px;
   box-sizing: border-box;
 }
+
+@media (max-width: 1024px) {
+  .progress-panel {
+    height: 8.5vh;
+    margin: 1.5% 10%;
+  }
+
+  .note-label {
+    font-size: 24px;
+  }
+
+  .progress-values {
+    font-size: 14px;
+  }
+
+  .progress-bar-bg {
+    margin: 1vh 2.5%;
+  }
+}
+
+@media (max-width: 768px) {
+  .progress-panel {
+    height: 8.5vh;
+    margin: 1.5% 10%;
+  }
+
+  .progress-info {
+    margin-top: 1vh;
+  }
+
+  .note-label {
+    font-size: 24px;
+  }
+
+  .progress-values {
+    font-size: 14px;
+  }
+
+  .progress-bar-bg {
+    margin: 1vh 2.5%;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape){
+  .progress-panel {
+    height: 15.5vh;
+    margin: 1.5% 10%;
+    border-radius: 2.5vh;
+  }
+
+  .progress-info {
+    margin-top: 2vh;
+  }
+
+  .note-label {
+    font-size: 24px;
+  }
+
+  .progress-values {
+    font-size: 14px;
+  }
+
+  .progress-bar-bg {
+    margin: 1vh 2.5%;
+  }
+}
+
 </style>

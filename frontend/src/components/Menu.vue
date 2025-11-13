@@ -17,6 +17,7 @@ const tabs = [
 ]
 const isDark = ref<boolean>(getStoredTheme())
 const showProfileMenu = ref<boolean>(false)
+const showMobileMenu = ref<boolean>(false)
 
 function navigateTo(to: string): void {
   if (route.path !== to) router.push(to)
@@ -39,6 +40,10 @@ function toggleProfileMenu(): void {
   showProfileMenu.value = !showProfileMenu.value
 }
 
+function toggleMobileMenu(): void {
+  showMobileMenu.value = !showMobileMenu.value
+}
+
 async function logout(): Promise<void> {
   try {
     const res = await logoutAPI();
@@ -53,7 +58,12 @@ async function logout(): Promise<void> {
 
 <template>
   <nav class="navbar">
-    <div class="tabs">
+    <div class="hamburger" @click="toggleMobileMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="tabs" :class="{ 'mobile-open': showMobileMenu }">
       <div
         v-for="tab in tabs"
         :key="tab.to"
@@ -96,6 +106,24 @@ async function logout(): Promise<void> {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid var(--menu-border);
   user-select: none;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background-color: var(--menu-text);
+  border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
 .tabs {
@@ -197,5 +225,133 @@ async function logout(): Promise<void> {
 
 .dark-icon {
   display: inline;
+}
+
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  .tab {
+    padding: 0 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .profile-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .theme-toggle {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+    padding: 0 1rem;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .tabs {
+    position: fixed;
+    top: 60px;
+    left: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: calc(100vh - 60px);
+    flex-direction: column;
+    align-items: stretch;
+    background-color: var(--menu-bg);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    transition: left 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+  }
+
+  .tabs.mobile-open {
+    left: 0;
+  }
+
+  .tab {
+    height: auto;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--menu-border);
+    border-left: 2px solid transparent;
+  }
+
+  .tab.active {
+    border-bottom: 1px solid var(--menu-border);
+    border-left-color: var(--button-bg);
+  }
+
+  .profile {
+    gap: 0.25rem;
+  }
+
+  .profile-img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .theme-toggle {
+    padding: 0.4rem;
+    font-size: 1rem;
+  }
+
+  .profile-menu {
+    top: 40px;
+    right: -5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 0.75rem;
+  }
+
+  .tabs {
+    width: 80%;
+    max-width: 250px;
+  }
+
+  .tab {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .profile-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .theme-toggle {
+    font-size: 0.95rem;
+    padding: 0.35rem;
+  }
+
+  .logout-btn {
+    padding: 0.65rem 0.875rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .navbar {
+    height: 50px;
+  }
+
+  .tabs {
+    top: 50px;
+    height: calc(100vh - 50px);
+  }
+
+  .tab {
+    padding: 0.75rem 1.25rem;
+  }
 }
 </style>
