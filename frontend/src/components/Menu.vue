@@ -164,7 +164,7 @@ async function logout(): Promise<void> {
   padding: 0.75rem 1rem;
   background: transparent;
   border: none;
-  color: var(--menu-text);
+  color: var(--selector-text);
   cursor: pointer;
   font-size: 0.95rem;
   text-align: left;
@@ -174,7 +174,6 @@ async function logout(): Promise<void> {
 }
 
 .logout-btn:hover {
-
   background-color: var(--selector-active);
 }
 
