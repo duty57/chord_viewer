@@ -23,8 +23,8 @@
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
     --border-color: #d1d5db;
-    --button-bg: #8e24aa;
-    --button-hover: #6a1b9a;
+    --button-bg: #E1BEE7;
+    --button-hover: #CE93D8;
     --menu-bg: #D81B60;
     --menu-border: #FF4081;
     --menu-hover: #C2185B;
@@ -33,6 +33,9 @@
     --selector-active: #F48FB1;
     --selector-text: #212121;
     --error-color: #ef4444;
+    --success-color: #00E676;
+    --link-inactive: #BA68C8;
+    --link-active: #E1BEE7;
 
     --fingering-1: #FF8A65;
     --fingering-2: #00E5FF;
@@ -57,6 +60,9 @@
     --selector-active: #F06292;
     --selector-text: #fafafa;
     --error-color: #f87171;
+    --success-color: #43A047;
+    --link-inactive: #BA68C8;
+    --link-active: #E1BEE7;
 
     --fingering-1: #FF5252;
     --fingering-2: #42A5F5;
@@ -68,6 +74,10 @@
     color: var(--error-color);
     margin-bottom: 1rem;
     transition: color 0.3s ease;
+  }
+
+  .success {
+    color: var(--success-color);
   }
 
 .content {
@@ -114,4 +124,15 @@
 .great-vibes {
   font-family: GreatVibes, monospace;
   letter-spacing: 3px;
+}
+
+.link {
+  color: var(--link-inactive);
+  transition: color 0.1s ease;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--link-active);
+  text-decoration: underline;
 }

@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {applyTheme, getStoredTheme} from "@/utils/theme_manager.ts";
-import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth"
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth"
 import {userInstance, User} from "../models/user.ts"
 import {auth} from "../config/firebase.ts"
 import {loginAPI, registerAPI} from "@/api/user_api.ts";
@@ -10,6 +10,7 @@ import {loginAPI, registerAPI} from "@/api/user_api.ts";
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const success = ref('')
 const router = useRouter()
 
 
@@ -62,6 +63,38 @@ async function register() {
   }
 }
 
+async function resetPassword() {
+  if (!email.value) {
+    error.value = "Please enter your email address.";
+    return;
+  }
+
+  try {
+
+    await sendPasswordResetEmail(auth, email.value);
+    success.value = "Password reset email sent! Check your inbox.";
+    error.value = "";
+    setTimeout(() => {
+      success.value = "";
+    }, 3000);
+  } catch (err: any) {
+    console.error("Password reset error:", err);
+    switch (err.code) {
+      case 'auth/user-not-found':
+        error.value = "No account found with this email.";
+        break;
+      case 'auth/invalid-email':
+        error.value = "Invalid email format.";
+        break;
+      case 'auth/too-many-requests':
+        error.value = "Too many requests. Please try again later.";
+        break;
+      default:
+        error.value = err.message || "Failed to send reset email.";
+    }
+  }
+}
+
 const loginWithGitHub = () => {
 
 }
@@ -88,8 +121,12 @@ onMounted(() => {
         <div class="form-group">
           <label>Password</label>
           <input type="password" v-model="password" required/>
+          <span class="link reset-password" @click="resetPassword">Reset password</span>
         </div>
+
         <p v-if="error" class="error">{{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
+
         <button type="submit" class="txt-btn submit">Login</button>
       </form>
       <button type="button" class="txt-btn register" @click="register">
@@ -173,7 +210,6 @@ input:focus {
 
 .submit {
   background-color: var(--button-bg);
-  color: white;
 }
 
 .submit:hover {
@@ -211,8 +247,11 @@ input:focus {
 
 .register:hover {
   background-color: var(--button-bg);
-  color: white;
   border-color: var(--button-bg);
+}
+
+.reset-password {
+  margin: 0;
 }
 
 </style>
