@@ -6,6 +6,7 @@ import {userInstance} from "@/models/user.ts";
 import {computed} from "vue";
 import {useRouter} from 'vue-router'
 import {navigateToChord} from "@/utils/chord_manager.ts";
+import StatsCard from "@/components/StatsCard.vue";
 
 const router = useRouter();
 const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords.values()].slice(-5).reverse()));
@@ -18,14 +19,8 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
   <div class="content">
     <h1>Statistics</h1>
     <div class="stats">
-      <div class="stats-card">
-        <h2>Chords learned</h2>
-        <h1>{{ userInstance.learnedChords.size }}</h1>
-      </div>
-      <div class="stats-card">
-        <h2>Favourite chords</h2>
-        <h1>{{userInstance.favouriteChords.size}}</h1>
-      </div>
+      <StatsCard title="Chords learned" :value="userInstance.learnedChords.size"></StatsCard>
+      <StatsCard title="Favourite chords" :value="userInstance.favouriteChords.size"></StatsCard>
     </div>
     <Divider></Divider>
     <div class="progress">
@@ -45,21 +40,6 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
   margin: 2vh 30%;
   justify-content: space-between;
   gap: 2rem;
-}
-
-.stats-card {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  margin-top: 5vh;
-}
-
-.stats-card h1 {
-  display: flex;
-  justify-content: center;
-  color: var(--text-secondary);
-  margin-top: 1vh;
-  font-size: 48px;
 }
 
 .progress {
@@ -105,15 +85,6 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
     gap: 1.5rem;
   }
 
-  .stats-card h1 {
-    font-size: 40px;
-  }
-
-  .stats-card h2 {
-    display: flex;
-    justify-content: center;
-  }
-
   .latest-learned {
     width: 90%;
     flex-direction: column;
@@ -138,10 +109,6 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
     flex-direction: column;
   }
 
-  .stats-card h1 {
-    font-size: 36px;
-  }
-
   .latest-learned {
     width: 95%;
     gap: 1rem;
@@ -160,10 +127,6 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
   .stats {
     width: 90%;
     margin: 2vh 5%;
-  }
-
-  .stats-card h1 {
-    font-size: 32px;
   }
 
   .latest-learned {
