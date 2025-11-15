@@ -1,10 +1,12 @@
 ﻿<script setup lang="ts">
-import {ref, onMounted, watch} from 'vue'
+import {ref, onMounted, watch, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {applyTheme, getStoredTheme, saveTheme} from "@/utils/theme_manager.ts";
 import {auth} from "@/config/firebase.ts";
 import {signOut} from "firebase/auth";
-import {logoutAPI} from "@/api/user_api.ts";
+import {logoutAPI, updateProfilePictureAPI} from "@/api/user_api.ts";
+import {getCatImageAPI} from "@/api/cataas.ts";
+import {userInstance} from "@/models/user.ts";
 
 const router = useRouter()
 const route = useRoute()
@@ -18,6 +20,7 @@ const tabs = [
 const isDark = ref<boolean>(getStoredTheme())
 const showProfileMenu = ref<boolean>(false)
 const showMobileMenu = ref<boolean>(false)
+const defaultPicture = computed(() => userInstance?.profilePictureUrl || '/img/placeholder_profile_picture.jpg')
 
 function navigateTo(to: string): void {
   if (route.path !== to) router.push(to)
@@ -44,6 +47,14 @@ function toggleMobileMenu(): void {
   showMobileMenu.value = !showMobileMenu.value
 }
 
+async function changeProfilePicture() {
+  const res = await getCatImageAPI();
+  if (res) {
+    await updateProfilePictureAPI(res.url);
+    userInstance.profilePictureUrl = res.url;
+  }
+}
+
 async function logout(): Promise<void> {
   try {
     const res = await logoutAPI();
@@ -56,42 +67,43 @@ async function logout(): Promise<void> {
 }
 </script>
 
-<template>
-  <nav class="navbar">
-    <div class="hamburger" @click="toggleMobileMenu">
-      <span></span>
-      <span></span>
-      <span></span>
+<template>  <nav class="navbar">
+  <div class="hamburger" @click="toggleMobileMenu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="tabs" :class="{ 'mobile-open': showMobileMenu }">
+    <div
+      v-for="tab in tabs"
+      :key="tab.to"
+      class="tab"
+      :class="{ active: route.path === tab.to }"
+      @click="navigateTo(tab.to)"
+    >
+      {{ tab.name }}
     </div>
-    <div class="tabs" :class="{ 'mobile-open': showMobileMenu }">
-      <div
-        v-for="tab in tabs"
-        :key="tab.to"
-        class="tab"
-        :class="{ active: route.path === tab.to }"
-        @click="navigateTo(tab.to)"
-      >
-        {{ tab.name }}
+  </div>
+  <div class="profile">
+    <label for="theme-toggle" class="theme-toggle" @click="switchMode">
+      <span v-if="!isDark" class="light-icon">🌙</span>
+      <span v-else class="dark-icon">☀️</span>
+    </label>
+    <div class="profile-container">
+      <img
+        :src="defaultPicture"
+        alt="Profile"
+        class="profile-img"
+        @click="toggleProfileMenu"
+      />
+      <div v-if="showProfileMenu" class="profile-menu">
+        <button class="dropdown-btn" @click="changeProfilePicture">Change profile picture</button>
+        <button class="dropdown-btn" @click="logout">Logout</button>
       </div>
     </div>
-    <div class="profile">
-      <label for="theme-toggle" class="theme-toggle" @click="switchMode">
-        <span v-if="!isDark" class="light-icon">🌙</span>
-        <span v-else class="dark-icon">☀️</span>
-      </label>
-      <div class="profile-container">
-        <img
-          src="/img/placeholder_profile_picture.jpg"
-          alt="Profile"
-          class="profile-img"
-          @click="toggleProfileMenu"
-        />
-        <div v-if="showProfileMenu" class="profile-menu">
-          <button class="logout-btn" @click="logout">Logout</button>
-        </div>
-      </div>
-    </div>
-  </nav>
+  </div>
+</nav>
+
 </template>
 
 <style scoped>
@@ -160,6 +172,7 @@ async function logout(): Promise<void> {
 
 .profile-container {
   position: relative;
+  height: 38px;
 }
 
 .profile-img {
@@ -187,7 +200,7 @@ async function logout(): Promise<void> {
   z-index: 1000;
 }
 
-.logout-btn {
+.dropdown-btn {
   width: 100%;
   padding: 0.75rem 1rem;
   background: transparent;
@@ -195,13 +208,22 @@ async function logout(): Promise<void> {
   color: var(--selector-text);
   cursor: pointer;
   font-size: 0.95rem;
-  text-align: left;
   transition: background-color 0.2s;
-  border-radius: 8px;
-
+  text-align: center;
 }
 
-.logout-btn:hover {
+.dropdown-btn:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+
+.dropdown-btn:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.dropdown-btn:hover {
   background-color: var(--selector-active);
 }
 
@@ -334,7 +356,7 @@ async function logout(): Promise<void> {
     padding: 0.35rem;
   }
 
-  .logout-btn {
+  .dropdown-btn {
     padding: 0.65rem 0.875rem;
     font-size: 0.9rem;
   }

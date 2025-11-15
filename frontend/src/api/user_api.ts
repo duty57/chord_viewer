@@ -59,3 +59,12 @@ export async function logoutAPI() {
     return null;
   }
 }
+
+export async function updateProfilePictureAPI(url : string) {
+  try {
+    const res = await api.put("/profile-picture", {profilePictureUrl: url});
+    return res.data;
+  }catch (err : any) {
+    return null;
+  }
+}

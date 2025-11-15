@@ -21,7 +21,7 @@ async function login() {
 
     const verification = await loginAPI(new User(email.value, password.value, token));
     if (verification) {
-      userInstance.setUser(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
+      userInstance.setUser(verification.email, password.value, "", verification.profilePictureUrl, verification.favouriteChords, verification.learnedChords);
       console.log(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
       await router.push("/home");
     } else {
@@ -40,7 +40,7 @@ async function register() {
 
     const verification = await registerAPI(new User(email.value, password.value, token));
     if (verification) {
-      userInstance.setUser(verification.email, password.value, "", verification.favouriteChords, verification.learnedChords);
+      userInstance.setUser(verification.email, password.value, "", verification.profilePictureUrl, verification.favouriteChords, verification.learnedChords);
       await router.push("/home");
     } else {
       error.value = "Registration succeeded but verification failed.";
@@ -105,12 +105,12 @@ async function signInWithGithub() {
     const userEmail = result.user.email || "";
     const verification = await loginAPI(new User(userEmail, "", token));
     if (verification) {
-      userInstance.setUser(verification.email, "", token, verification.favouriteChords, verification.learnedChords);
+      userInstance.setUser(verification.email, "", token, verification.profilePictureUrl, verification.favouriteChords, verification.learnedChords);
       await router.push("/home");
     } else {
       const registrationVerification = await registerAPI(new User(userEmail || '', '', token));
       if (registrationVerification) {
-        userInstance.setUser(registrationVerification.email, '', token, registrationVerification.favouriteChords, registrationVerification.learnedChords);
+        userInstance.setUser(registrationVerification.email, '', token, registrationVerification.profilePictureUrl, registrationVerification.favouriteChords, registrationVerification.learnedChords);
         await router.push("/home");
       } else {
         error.value = "GitHub authentication failed.";
@@ -141,12 +141,12 @@ async function singInWithGoogle() {
     const userEmail = result.user.email || "";
     const verification = await loginAPI(new User(userEmail, "", token));
     if (verification) {
-      userInstance.setUser(verification.email, "", token, verification.favouriteChords, verification.learnedChords);
+      userInstance.setUser(verification.email, "", token, verification.profilePictureUrl, verification.favouriteChords, verification.learnedChords);
       await router.push("/home");
     } else {
       const registrationVerification = await registerAPI(new User(userEmail || '', '', token));
       if (registrationVerification) {
-        userInstance.setUser(registrationVerification.email, '', token, registrationVerification.favouriteChords, registrationVerification.learnedChords);
+        userInstance.setUser(registrationVerification.email, '', token, registrationVerification.profilePictureUrl, registrationVerification.favouriteChords, registrationVerification.learnedChords);
         await router.push("/home");
       } else {
         error.value = "Google authentication failed.";

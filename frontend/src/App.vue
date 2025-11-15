@@ -11,7 +11,7 @@ onMounted( async () => {
     const res = await meAPI();
 
     if (res) {
-      userInstance.setUser(res.email, "", "", res.favouriteChords, res.learnedChords);
+      userInstance.setUser(res.email, "", "", res.profilePictureUrl, res.favouriteChords, res.learnedChords);
       console.log(res.email, "", "", res.favouriteChords, res.learnedChords)
     }
   });
