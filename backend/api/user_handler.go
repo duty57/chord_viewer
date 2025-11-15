@@ -56,6 +56,12 @@ func RegisterRoutes(router *gin.Engine) {
 			protected.DELETE("/favChord", deleteFavouriteChordHandler)
 			protected.DELETE("/learnedChord", deleteLearnedChordHandler)
 			protected.GET("/chord", chordHandler)
+			protected.PUT("/profile-picture", updateProfilePictureHandler)
+		}
+
+		admin := api.Group("/admin").Use(utils.AdminMiddleware(authClient, firestoreClient))
+		{
+			admin.GET("/users/count", getUserCount)
 		}
 	}
 
@@ -69,6 +75,10 @@ func loginHandler(c *gin.Context) {
 
 	ctx := context.Background()
 	token, err := authClient.VerifyIDToken(ctx, idToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
+	}
 
 	var body types.User // get body
 	if err := c.BindJSON(&body); err != nil {
@@ -100,12 +110,13 @@ func loginHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":          "logged_in",
-		"uid":             token.UID,
-		"email":           body.Email,
-		"admin":           user.Admin,
-		"favouriteChords": user.FavouriteChords,
-		"learnedChords":   user.LearnedChords,
+		"status":            "logged_in",
+		"uid":               token.UID,
+		"email":             body.Email,
+		"admin":             user.Admin,
+		"profilePictureUrl": user.ProfilePictureUrl,
+		"favouriteChords":   user.FavouriteChords,
+		"learnedChords":     user.LearnedChords,
 	})
 }
 
@@ -118,6 +129,10 @@ func registerHandler(c *gin.Context) {
 
 	ctx := context.Background()
 	token, err := authClient.VerifyIDToken(ctx, idToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
+	}
 
 	var body types.User
 	if err := c.BindJSON(&body); err != nil {
@@ -135,10 +150,11 @@ func registerHandler(c *gin.Context) {
 
 	// Create new user document
 	newUser := types.User{
-		Email:           body.Email,
-		Admin:           false, // Default to non-admin
-		FavouriteChords: make([]string, 0),
-		LearnedChords:   make([]string, 0),
+		Email:             body.Email,
+		Admin:             false, // Default to non-admin
+		ProfilePictureUrl: "",
+		FavouriteChords:   make([]string, 0),
+		LearnedChords:     make([]string, 0),
 	}
 
 	_, err = firestoreClient.Collection("users").Doc(token.UID).Set(c, newUser)
@@ -154,12 +170,13 @@ func registerHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"status":          "user_created",
-		"uid":             token.UID,
-		"email":           newUser.Email,
-		"admin":           newUser.Admin,
-		"favouriteChords": newUser.FavouriteChords,
-		"learnedChords":   newUser.LearnedChords,
+		"status":            "user_created",
+		"uid":               token.UID,
+		"email":             newUser.Email,
+		"admin":             newUser.Admin,
+		"profilePictureUrl": newUser.ProfilePictureUrl,
+		"favouriteChords":   newUser.FavouriteChords,
+		"learnedChords":     newUser.LearnedChords,
 	})
 }
 
@@ -186,12 +203,13 @@ func meHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":          "user_data_parsed",
-		"uid":             token.UID,
-		"email":           user.Email,
-		"admin":           user.Admin,
-		"favouriteChords": user.FavouriteChords,
-		"learnedChords":   user.LearnedChords,
+		"status":            "user_data_parsed",
+		"uid":               token.UID,
+		"email":             user.Email,
+		"admin":             user.Admin,
+		"profilePictureUrl": user.ProfilePictureUrl,
+		"favouriteChords":   user.FavouriteChords,
+		"learnedChords":     user.LearnedChords,
 	})
 }
 
@@ -238,6 +256,37 @@ func refreshHandler(c *gin.Context) {
 func logoutHandler(c *gin.Context) {
 	utils.ClearSession(c)
 	c.JSON(http.StatusOK, gin.H{"status": "logged_out"})
+}
+
+func updateProfilePictureHandler(c *gin.Context) {
+	tokenInterface, exists := c.Get("user_token")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	token := tokenInterface.(*auth.Token)
+
+	var body struct {
+		ProfilePictureUrl string `json:"profilePictureUrl"`
+	}
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	docRef := firestoreClient.Collection("users").Doc(token.UID)
+	_, err := docRef.Update(context.Background(), []firestore.Update{
+		{Path: "ProfilePictureUrl", Value: body.ProfilePictureUrl},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update profile picture"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":            "profile_picture_updated",
+		"profilePictureUrl": body.ProfilePictureUrl,
+	})
 }
 
 func setupCORS(router *gin.Engine) {

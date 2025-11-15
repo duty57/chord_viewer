@@ -4,15 +4,75 @@ import Menu from "@/components/Menu.vue";
 import StatsCard from "@/components/StatsCard.vue";
 import Divider from "@/components/Divider.vue";
 import DeleteButton from "@/components/DeleteButton.vue";
+import {onMounted, ref} from "vue";
+import {getUserCountAPI} from "@/api/admin_api.ts";
+
+const userCount = ref<number>(0);
+
+onMounted(async () => {
+  setTimeout(async () => {
+    const res = await getUserCountAPI();
+    userCount.value = res.count;
+  }, 100);
+});
+
 </script>
 
 <template>
   <Menu></Menu>
   <div class="content">
-    <StatsCard title="Amount of users registered" :value="0"></StatsCard>
+    <StatsCard title="Amount of users registered" :value="userCount || 0"></StatsCard>
     <Divider></Divider>
     <h1>Users</h1>
     <div class="user-list">
+      <div class="user-card">
+        <img src="/img/placeholder_profile_picture.jpg" alt="Profile">
+        <p>admin@gmail.com</p>
+        <div class="management-buttons">
+          <button class="edit-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+          <DeleteButton class="trash-btn"></DeleteButton>
+        </div>
+      </div>
+      <div class="user-card">
+        <img src="/img/placeholder_profile_picture.jpg" alt="Profile">
+        <p>admin@gmail.com</p>
+        <div class="management-buttons">
+          <button class="edit-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+          <DeleteButton class="trash-btn"></DeleteButton>
+        </div>
+      </div>
+      <div class="user-card">
+        <img src="/img/placeholder_profile_picture.jpg" alt="Profile">
+        <p>admin@gmail.com</p>
+        <div class="management-buttons">
+          <button class="edit-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+          <DeleteButton class="trash-btn"></DeleteButton>
+        </div>
+      </div>
+      <div class="user-card">
+        <img src="/img/placeholder_profile_picture.jpg" alt="Profile">
+        <p>admin@gmail.com</p>
+        <div class="management-buttons">
+          <button class="edit-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+          <DeleteButton class="trash-btn"></DeleteButton>
+        </div>
+      </div>
       <div class="user-card">
         <img src="/img/placeholder_profile_picture.jpg" alt="Profile">
         <p>admin@gmail.com</p>
@@ -43,7 +103,7 @@ import DeleteButton from "@/components/DeleteButton.vue";
   margin-top: 2vh;
   flex-direction: column;
   justify-content: center;
-  gap: 1vh;
+  gap: 2.5vh;
 }
 
 .user-card {
@@ -68,7 +128,7 @@ img {
 
 .management-buttons {
   display: flex;
-  width: 12.5%;
+  width: 76px;
   align-items: stretch;
   height: 100%;
 }

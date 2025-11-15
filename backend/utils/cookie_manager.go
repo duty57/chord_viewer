@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
@@ -110,6 +111,38 @@ func AuthMiddleware(authClient *auth.Client) gin.HandlerFunc {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh session"})
 				return
 			}
+		}
+
+		c.Set("user_token", token)
+		c.Next()
+	}
+}
+
+func AdminMiddleware(authClient *auth.Client, firestoreClient *firestore.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// First verify authentication
+		token, err := VerifyAccessToken(c, authClient)
+		if err != nil {
+			token, err = VerifyRefreshToken(c, authClient)
+			if err != nil {
+				ClearSession(c)
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Session expired, please login again"})
+				return
+			}
+		}
+
+		// Check if user is admin
+		userDoc, err := firestoreClient.Collection("users").Doc(token.UID).Get(context.Background())
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user data"})
+			return
+		}
+
+		data := userDoc.Data()
+		isAdmin, ok := data["Admin"].(bool)
+		if !ok || !isAdmin {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied: Admin privileges required"})
+			return
 		}
 
 		c.Set("user_token", token)
