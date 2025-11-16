@@ -9,7 +9,7 @@ const visibleNotes = computed(() =>
 );
 
 const progress = reactive<Record<string, number>>({
-  'C': 0,
+  'C': 423,
   'D': 0,
   'E': 0,
   'F': 0,
@@ -19,14 +19,18 @@ const progress = reactive<Record<string, number>>({
 });
 
 function calculateProgress() {
+  Object.keys(progress).forEach(key => {
+    progress[key] = 0;
+  });
 
-  for (const key in progress) progress[key] = 0;
+  const learnedChords = userInstance.learnedChords;
 
-  const learnedChords: Set<string> = userInstance.learnedChords;
-  for (const chord of learnedChords) {
-      progress[chord[0]] += 1;
-  }
-  console.log("good");
+  learnedChords.forEach((chord: string) => {
+    const firstChar = chord[0];
+    if (firstChar && Object.prototype.hasOwnProperty.call(progress, firstChar)) {
+      progress[firstChar] = (progress[firstChar] ?? 0) + 1;
+    }
+  });
 }
 
 
@@ -50,11 +54,12 @@ watch(
   <div class="content">
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
-        <label class="note-label">{{note.label}}</label>
-        <label class="progress-values">{{`${progress[note.label]}/${note.maxAmount}`}}</label>
+        <label class="note-label">{{ note.label }}</label>
+        <label class="progress-values">{{ `${progress[note.label]}/${note.maxAmount}` }}</label>
       </div>
-      <div class="progress-bar-bg" >
-        <span class="progress-bar" :style="{backgroundColor: note.color, width: progress[note.label] / note.maxAmount * 100 + '%'}"></span>
+      <div class="progress-bar-bg">
+        <span class="progress-bar"
+              :style="{backgroundColor: note.color, width: (progress[note.label] ?? 0)/ note.maxAmount * 100 + '%'}"></span>
       </div>
     </div>
   </div>
@@ -146,7 +151,7 @@ watch(
   }
 }
 
-@media (max-width: 768px) and (orientation: landscape){
+@media (max-width: 768px) and (orientation: landscape) {
   .progress-panel {
     height: 15.5vh;
     margin: 1.5% 10%;
