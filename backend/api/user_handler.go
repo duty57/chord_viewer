@@ -63,6 +63,11 @@ func RegisterRoutes(router *gin.Engine) {
 		{
 			admin.GET("/users/count", getUserCountHandler)
 			admin.GET("/users", getUsersHandler)
+			admin.PUT("/users/email", updateUserEmailHandler)
+			admin.PUT("/users/picture", updateUserProfilePictureHandler)
+			admin.PUT("/users/promote", promoteToAdminHandler)
+			admin.DELETE("/users", deleteUserHandler)
+			admin.GET("/access", accessAdminPageHandler)
 		}
 	}
 

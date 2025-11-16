@@ -7,6 +7,7 @@ import Learning from "@/view/Learning.vue";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "@/config/firebase.ts";
 import Admin from "@/view/Admin.vue";
+import {accessAdminPageAPI} from "@/api/admin_api.ts";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,16 +17,25 @@ const router = createRouter({
     {path: "/chords", component: Chords, meta: {requiresAuth: true}},
     {path: "/favourite", component: Favourite, meta: {requiresAuth: true}},
     {path: "/learning", component: Learning, meta: {requiresAuth: true}},
-    {path: "/admin", component: Admin, meta: {requiresAuth: true}},
+    {path: "/admin", component: Admin, meta: {requiresAuth: true, requiresAdmin: true}},
   ],
 })
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth;
+  const requiresAdmin = to.meta.requiresAdmin;
   if (requiresAuth) {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       unsubscribe();
       if (user) {
+        if (requiresAdmin) {
+          const res = await accessAdminPageAPI();
+          if (res && res.admin) {
+            next();
+          }else {
+            next("/home")
+          }
+        }
         next();
       } else {
         next('/');

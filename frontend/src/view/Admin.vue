@@ -5,13 +5,27 @@ import StatsCard from "@/components/StatsCard.vue";
 import Divider from "@/components/Divider.vue";
 import DeleteButton from "@/components/DeleteButton.vue";
 import {computed, onMounted, ref} from "vue";
-import {getUserCountAPI, getUsersAPI} from "@/api/admin_api.ts";
+import {
+  deleteUserAPI,
+  getUserCountAPI,
+  getUsersAPI,
+  promoteToAdminAPI,
+  updateUserEmailAPI, updateUserProfilePictureAPI
+} from "@/api/admin_api.ts";
 import type {User} from "@/models/user.ts";
+import {getCatImageAPI} from "@/api/cataas.ts";
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 const userCount = ref<number>(0);
 const currentPage = ref<number>(1);
 const lastPage = computed(() => Math.max(1, Math.ceil(userCount.value / 5)));
 const users = ref<User[]>([]);
+const showEditMenu = ref<string | null>(null);
+const editingEmail = ref<string | null>(null);
+const newEmail = ref<string>("");
+const editingProfilePicture = ref<string | null>(null);
+const newProfilePictureUrl = ref<string>("");
 
 async function loadUserCount() {
   const res = await getUserCountAPI();
@@ -26,6 +40,92 @@ async function goToPage(page: number) {
   if (res) {
     users.value = res.users || [];
     currentPage.value = res.page;
+  }
+}
+
+function toggleEditMenu(email: string) {
+  if (showEditMenu.value === email) {
+    showEditMenu.value = null;
+  } else {
+    showEditMenu.value = email;
+  }
+}
+
+function startEditEmail(email: string) {
+  if (editingProfilePicture.value == email) return;
+  editingEmail.value = email;
+  newEmail.value = email;
+  showEditMenu.value = null;
+}
+
+async function saveNewEmail(oldEmail: string) {
+  if (newEmail.value && newEmail.value !== oldEmail) {
+    const res = await updateUserEmailAPI(oldEmail, newEmail.value);
+    if (res) {
+      const user = users.value.find(u => u.email === oldEmail);
+      if (user) {
+        user.email = newEmail.value;
+      }
+    }
+  }
+  editingEmail.value = null;
+  newEmail.value = "";
+}
+
+function cancelEditEmail() {
+  editingEmail.value = null;
+  newEmail.value = "";
+}
+
+function startEditProfilePicture(email: string, currentUrl: string) {
+  if (editingEmail.value == email) return;
+  editingProfilePicture.value = email;
+  newProfilePictureUrl.value = currentUrl || "";
+  showEditMenu.value = null;
+}
+
+async function generateRandomPicture() {
+  const res = await getCatImageAPI();
+  if (res && res.url) {
+    newProfilePictureUrl.value = res.url;
+  }
+}
+
+async function saveNewProfilePicture(email: string) {
+  if (newProfilePictureUrl.value) {
+    const res = await updateUserProfilePictureAPI(email, newProfilePictureUrl.value);
+    if (res) {
+      const user = users.value.find(u => u.email === email);
+      if (user) {
+        user.profilePictureUrl = newProfilePictureUrl.value;
+      }
+    }
+  }
+  editingProfilePicture.value = null;
+  newProfilePictureUrl.value = "";
+}
+
+function cancelEditProfilePicture() {
+  editingProfilePicture.value = null;
+  newProfilePictureUrl.value = "";
+}
+
+async function promoteUser(email: string) {
+  showEditMenu.value = null;
+  await promoteToAdminAPI(email);
+}
+
+async function deleteUser(email: string) {
+  console.log("deleting email: " + email);
+  const res = await deleteUserAPI(email);
+  if (res) {
+    console.log("email deleted");
+    userCount.value--;
+    users.value = users.value.filter(u => u.email !== email);
+    await goToPage(currentPage.value);
+    if (users.value.length === 0 && currentPage.value > 1) {
+      await goToPage(currentPage.value - 1);
+    }
   }
 }
 
@@ -47,14 +147,55 @@ onMounted(async () => {
     <div class="user-list">
       <div class="user-card" v-for="user in users" :key="user.email">
         <img :src="user.profilePictureUrl || '/img/placeholder_profile_picture.jpg'" alt="Profile">
-        <p>{{user.email}}</p>
+
+        <!-- Email editing -->
+        <div v-if="editingEmail === user.email" class="email-edit">
+          <input
+            v-model="newEmail"
+            type="email"
+            class="email-input"
+            @keyup.enter="saveNewEmail(user.email)"
+            @keyup.esc="cancelEditEmail"
+          />
+          <button class="save-btn" @click="saveNewEmail(user.email)">✓</button>
+          <button class="cancel-btn" @click="cancelEditEmail">✕</button>
+        </div>
+
+        <!-- Profile picture editing -->
+        <div v-else-if="editingProfilePicture === user.email" class="picture-edit">
+          <input
+            v-model="newProfilePictureUrl"
+            type="text"
+            class="picture-input"
+            placeholder="Enter image URL"
+            @keyup.enter="saveNewProfilePicture(user.email)"
+            @keyup.esc="cancelEditProfilePicture"
+          />
+          <button class="random-btn" @click="generateRandomPicture">🎲</button>
+          <button class="save-btn" @click="saveNewProfilePicture(user.email)">✓</button>
+          <button class="cancel-btn" @click="cancelEditProfilePicture">✕</button>
+        </div>
+
+        <p v-else>{{ user.email }}</p>
         <div class="management-buttons">
-          <button class="edit-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-          </button>
-          <DeleteButton class="trash-btn"></DeleteButton>
+          <div class="edit-btn-container">
+            <button class="edit-btn" @click="toggleEditMenu(user.email)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
+            <div v-if="showEditMenu === user.email" class="edit-menu">
+              <button class="edit-menu-btn" @click="startEditEmail(user.email)">
+                Update email
+              </button>
+              <button class="edit-menu-btn" @click="startEditProfilePicture(user.email, user.profilePictureUrl || '')">
+                Change profile picture
+              </button>
+              <button class="edit-menu-btn" @click="promoteUser(user.email)">Promote user</button>
+            </div>
+          </div>
+          <DeleteButton class="trash-btn" @click="deleteUser(user.email)"></DeleteButton>
         </div>
       </div>
     </div>
@@ -64,9 +205,9 @@ onMounted(async () => {
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
         </svg>
       </button>
-      <button class="txt-btn" @click="goToPage(currentPage)">{{currentPage}}</button>
+      <button class="txt-btn" @click="goToPage(currentPage)">{{ currentPage }}</button>
       <span class="ellipsis">...</span>
-      <button class="txt-btn" @click="goToPage(lastPage)">{{lastPage}}</button>
+      <button class="txt-btn" @click="goToPage(lastPage)">{{ lastPage }}</button>
       <button class="txt-btn arrow" @click="goToPage(Math.min(lastPage, currentPage + 1))">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
@@ -74,15 +215,9 @@ onMounted(async () => {
       </button>
     </div>
   </div>
-<!--  delete button should look like one in Favourites page, and be rounded from the right, next to it(without gap) edit button (pencil (gray/blue)) icon-->
-<!--  use pagination for parsing users-->
-<!--  edit should be able to change email / send reset password email or reset password and maybe change profile picture-->
 </template>
 
 <style scoped>
-.content {
-
-}
 
 .user-list {
   width: 50%;
@@ -109,8 +244,65 @@ img {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid white;
-  cursor: pointer;
   transition: opacity 0.2s;
+}
+
+.email-edit, .picture-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0 16px;
+}
+
+.email-input, .picture-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--menu-border);
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.save-btn, .cancel-btn, .random-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.save-btn {
+  background-color: var(--success-color);
+  color: var(--text-primary);
+}
+
+.save-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-btn {
+  background-color: var(--error-color);
+  color: var(--text-primary);
+}
+
+.cancel-btn:hover {
+  background-color: #da190b;
+}
+
+.random-btn {
+  background-color: var(--button-bg);
+  color: var(--text-primary);
+}
+
+.random-btn:hover {
+  background-color: var(--button-hover);
 }
 
 .management-buttons {
@@ -120,8 +312,14 @@ img {
   height: 100%;
 }
 
-.edit-btn {
+.edit-btn-container {
+  position: relative;
   width: 50%;
+}
+
+.edit-btn {
+  width: 100%;
+  height: 100%;
   border: none;
   cursor: pointer;
   display: flex;
@@ -139,6 +337,34 @@ img {
   width: 24px;
   height: 24px;
   fill: var(--text-primary);
+}
+
+.edit-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.edit-menu-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.edit-menu-btn:hover {
+  background-color: var(--selector-active);
 }
 
 .trash-btn {
