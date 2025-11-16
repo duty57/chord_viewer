@@ -22,6 +22,10 @@ export class User {
     return this._learnedChords;
   }
 
+  set email(value: string){
+    this._email = value;
+  }
+
   set profilePictureUrl(value: string) {
     this._profilePictureUrl = value;
   }
