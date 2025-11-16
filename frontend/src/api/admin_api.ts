@@ -8,3 +8,12 @@ export async function getUserCountAPI(){
     return 0;
   }
 }
+
+export async function getUsersAPI(page: number) {
+  try {
+    const res = await api.get(`/admin/users?page=${page}`);
+    return res.data;
+  }catch (err: any) {
+    return null;
+  }
+}

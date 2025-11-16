@@ -48,7 +48,6 @@ export class User {
     this._profilePictureUrl = profilePictureUrl;
     if (favouriteChords) favouriteChords.forEach(chord => this._favouriteChords.add(chord));
     if (learnedChords) learnedChords.forEach(chord => this._learnedChords.add(chord));
-    console.log(this);
   }
 
 }

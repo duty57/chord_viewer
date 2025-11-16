@@ -61,7 +61,8 @@ func RegisterRoutes(router *gin.Engine) {
 
 		admin := api.Group("/admin").Use(utils.AdminMiddleware(authClient, firestoreClient))
 		{
-			admin.GET("/users/count", getUserCount)
+			admin.GET("/users/count", getUserCountHandler)
+			admin.GET("/users", getUsersHandler)
 		}
 	}
 
