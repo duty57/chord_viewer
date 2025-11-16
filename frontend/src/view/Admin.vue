@@ -421,4 +421,207 @@ img {
 .page-scroller span {
   margin-top: 5px;
 }
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .user-list {
+    width: 70%;
+  }
+
+  .user-card {
+    height: 64px;
+  }
+
+  img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .email-edit, .picture-edit {
+    gap: 6px;
+    margin: 0 12px;
+  }
+
+  .email-input, .picture-input {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .save-btn, .cancel-btn, .random-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .management-buttons {
+    width: 68px;
+  }
+
+  .edit-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .edit-menu {
+    min-width: 180px;
+  }
+
+  .edit-menu-btn {
+    padding: 0.65rem 0.875rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .user-list {
+    width: 90%;
+    gap: 2vh;
+  }
+
+  .user-card {
+    height: 56px;
+    border-radius: 56px;
+  }
+
+  img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .email-edit, .picture-edit {
+    gap: 4px;
+    margin: 0 8px;
+    flex-wrap: wrap;
+  }
+
+  .email-input, .picture-input {
+    padding: 6px 8px;
+    font-size: 12px;
+    min-width: 0;
+  }
+
+  .save-btn, .cancel-btn, .random-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+
+  .management-buttons {
+    width: 60px;
+  }
+
+  .edit-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .edit-menu {
+    min-width: 160px;
+    right: -10px;
+  }
+
+  .edit-menu-btn {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .page-scroller {
+    gap: 6px;
+    margin-top: 1.5vh;
+  }
+
+  .txt-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .arrow {
+    width: 28px;
+    height: 28px;
+  }
+
+  .txt-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .user-list {
+    width: 95%;
+    gap: 1.5vh;
+  }
+
+  .user-card {
+    height: 52px;
+    border-radius: 52px;
+  }
+
+  img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .email-edit, .picture-edit {
+    gap: 3px;
+    margin: 0 6px;
+  }
+
+  .email-input, .picture-input {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+
+  .save-btn, .cancel-btn, .random-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .management-buttons {
+    width: 56px;
+  }
+
+  .edit-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .edit-menu {
+    min-width: 140px;
+    right: -15px;
+  }
+
+  .edit-menu-btn {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .page-scroller {
+    gap: 4px;
+  }
+
+  .txt-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+
+  .arrow {
+    width: 26px;
+    height: 26px;
+  }
+
+  .txt-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ellipsis {
+    font-size: 14px;
+  }
+}
 </style>

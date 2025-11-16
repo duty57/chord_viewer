@@ -29,7 +29,7 @@ function navigateTo(to: string): void {
 watch(isDark, (newValue) => {
   applyTheme(newValue)
   saveTheme(newValue)
-}, { immediate: true })
+}, {immediate: true})
 
 onMounted(() => {
   applyTheme(isDark.value)
@@ -67,44 +67,47 @@ async function logout(): Promise<void> {
 }
 </script>
 
-<template>  <nav class="navbar">
-  <div class="hamburger" @click="toggleMobileMenu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-  <div class="tabs" :class="{ 'mobile-open': showMobileMenu }">
-    <div
-      v-for="tab in tabs"
-      :key="tab.to"
-      class="tab"
-      :class="{ active: route.path === tab.to }"
-      @click="navigateTo(tab.to)"
-    >
-      {{ tab.name }}
-    </div>
-  </div>
-  <div class="profile">
-    <label for="theme-toggle" class="theme-toggle" @click="switchMode">
-      <span v-if="!isDark" class="light-icon">🌙</span>
-      <span v-else class="dark-icon">☀️</span>
-    </label>
-    <div class="profile-container">
-      <img
-        :src="defaultPicture"
-        alt="Profile"
-        class="profile-img"
-        :title="userInstance.email"
-        @click="toggleProfileMenu"
-      />
-      <div v-if="showProfileMenu" class="profile-menu">
-        <button class="dropdown-btn" @click="changeProfilePicture">Change profile picture</button>
-        <button class="dropdown-btn" @click="logout">Logout</button>
+<template>
+  <header>
+    <nav class="navbar">
+      <div class="hamburger" @click="toggleMobileMenu">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
-    </div>
-  </div>
-</nav>
-
+      <div class="tabs" :class="{ 'mobile-open': showMobileMenu }">
+        <div
+          v-for="tab in tabs"
+          :key="tab.to"
+          class="tab"
+          :class="{ active: route.path === tab.to }"
+          @click="navigateTo(tab.to)"
+        >
+          {{ tab.name }}
+        </div>
+      </div>
+      <div class="profile">
+        <label for="theme-toggle" class="theme-toggle" @click="switchMode">
+          <span v-if="!isDark" class="light-icon">🌙</span>
+          <span v-else class="dark-icon">☀️</span>
+        </label>
+        <div class="profile-container">
+          <img
+            :src="defaultPicture"
+            alt="Profile"
+            class="profile-img"
+            :title="userInstance.email"
+            @click="toggleProfileMenu"
+          />
+          <div v-if="showProfileMenu" class="profile-menu">
+            <button class="dropdown-btn" @click="changeProfilePicture">Change profile picture
+            </button>
+            <button class="dropdown-btn" @click="logout">Logout</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
 </template>
 
 <style scoped>
