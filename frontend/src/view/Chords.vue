@@ -259,7 +259,6 @@ const filteredCompounds = computed(() => {
   margin: 1.5% 10%;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem;
 }
 
 .note, .alteration, .compound {
@@ -273,7 +272,6 @@ const filteredCompounds = computed(() => {
   color: var(--selector-text);
   cursor: pointer;
   transition: background-color 0.2s ease;
-  border-radius: 4px;
 }
 
 .note.active, .alteration.active, .compound.active {
@@ -355,6 +353,11 @@ const filteredCompounds = computed(() => {
   .note-selector, .alteration-selector, .compound-selector {
     width: 90%;
     margin: 1.5% 5%;
+    gap: 0.5rem;
+  }
+
+  .note, .alteration, .compound {
+    border-radius: 4px;
   }
 
   .cell {
@@ -392,6 +395,7 @@ const filteredCompounds = computed(() => {
     min-width: 40px;
     height: 40px;
     font-size: 14px;
+    border-radius: 4px;
   }
 
   .cell {
@@ -438,6 +442,7 @@ const filteredCompounds = computed(() => {
   .note-selector, .alteration-selector, .compound-selector {
     width: 98%;
     margin: 0.75rem 1%;
+    gap: 0.5rem;
   }
 
   .note, .alteration, .compound {
@@ -445,6 +450,7 @@ const filteredCompounds = computed(() => {
     height: 35px;
     font-size: 12px;
     padding: 0.25rem;
+    border-radius: 4px;
   }
 
   .cell {
@@ -474,10 +480,12 @@ const filteredCompounds = computed(() => {
 
   .note, .alteration, .compound {
     height: 35px;
+    border-radius: 4px;
   }
 
   .chord-selector {
     margin-top: 0.5rem;
+    gap: 0.5rem;
   }
 
   .note-selector, .alteration-selector, .compound-selector {
