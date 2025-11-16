@@ -94,6 +94,7 @@ async function logout(): Promise<void> {
         :src="defaultPicture"
         alt="Profile"
         class="profile-img"
+        :title="userInstance.email"
         @click="toggleProfileMenu"
       />
       <div v-if="showProfileMenu" class="profile-menu">
