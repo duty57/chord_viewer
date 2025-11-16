@@ -199,6 +199,7 @@ async function logout(): Promise<void> {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   min-width: 120px;
   z-index: 1000;
+  overflow: hidden;
 }
 
 .dropdown-btn {
@@ -213,16 +214,6 @@ async function logout(): Promise<void> {
   text-align: center;
 }
 
-.dropdown-btn:first-child {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-
-.dropdown-btn:last-child {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
 
 .dropdown-btn:hover {
   background-color: var(--selector-active);
