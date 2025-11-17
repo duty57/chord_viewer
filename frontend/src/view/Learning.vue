@@ -9,7 +9,7 @@ const visibleNotes = computed(() =>
 );
 
 const progress = reactive<Record<string, number>>({
-  'C': 423,
+  'C': 0,
   'D': 0,
   'E': 0,
   'F': 0,

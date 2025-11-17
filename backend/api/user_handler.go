@@ -109,6 +109,12 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
+	err = utils.CreateSession(c, authClient, idToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"status":            "logged_in",
 		"uid":               token.UID,
@@ -163,6 +169,12 @@ func registerHandler(c *gin.Context) {
 		return
 	}
 
+	err = utils.CreateSession(c, authClient, idToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session cookie"})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"status":            "user_created",
 		"uid":               token.UID,
@@ -209,6 +221,14 @@ func meHandler(c *gin.Context) {
 
 func refreshHandler(c *gin.Context) {
 	// Verify user still has valid refresh token
+	_, err := utils.VerifyRefreshToken(c, authClient)
+	if err != nil {
+		utils.ClearSession(c)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Refresh token expired, please login again",
+		})
+		return
+	}
 
 	// Get new Firebase ID token from header
 	idToken, success := utils.GetAuthHeader(c)
@@ -226,6 +246,13 @@ func refreshHandler(c *gin.Context) {
 		return
 	}
 
+	// Create new session cookies
+	err = utils.CreateSession(c, authClient, idToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh session"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": "tokens_refreshed",
 		"uid":    token.UID,
@@ -233,6 +260,7 @@ func refreshHandler(c *gin.Context) {
 }
 
 func logoutHandler(c *gin.Context) {
+	utils.ClearSession(c)
 	c.JSON(http.StatusOK, gin.H{"status": "logged_out"})
 }
 
@@ -269,7 +297,7 @@ func updateProfilePictureHandler(c *gin.Context) {
 
 func setupCORS(router *gin.Engine) {
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "https://chord-viewer.netlify.app"}
+	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "https://chord-viewer.onrender.com", "https://willowy-pithivier-7a4e77.netlify.app"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept"}
 	config.AllowCredentials = true
