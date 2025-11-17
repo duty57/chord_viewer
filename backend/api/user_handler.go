@@ -297,7 +297,7 @@ func updateProfilePictureHandler(c *gin.Context) {
 
 func setupCORS(router *gin.Engine) {
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "https://chord-viewer.onrender.com", "https://willowy-pithivier-7a4e77.netlify.app"}
+	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "https://chord-viewer.netlify.app/"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept"}
 	config.AllowCredentials = true
