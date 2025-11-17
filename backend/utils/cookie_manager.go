@@ -89,28 +89,16 @@ func ClearSession(c *gin.Context) {
 
 func AuthMiddleware(authClient *auth.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := VerifyAccessToken(c, authClient)
-		if err == nil {
-			c.Set("user_token", token)
-			c.Next()
+		idToken, success := GetAuthHeader(c)
+		if !success {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid Authorization header"})
 			return
 		}
 
-		token, err = VerifyRefreshToken(c, authClient)
+		token, err := authClient.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			ClearSession(c)
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Session expired, please login again"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			return
-		}
-
-		idToken := c.GetHeader("Authorization")
-		if idToken != "" && len(idToken) > 7 {
-			idToken = idToken[7:]
-			err = CreateSession(c, authClient, idToken)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh session"})
-				return
-			}
 		}
 
 		c.Set("user_token", token)
