@@ -47,7 +47,7 @@ export async function promoteToAdminAPI(email: string) {
 
 export async function deleteUserAPI(email: string) {
   try {
-    const res = await api.delete(`admin/users?email=${email}`);
+    const res = await api.delete(`/admin/users?email=${email}`);
     return res.data;
   }catch (err : any) {
     return null;
@@ -56,7 +56,7 @@ export async function deleteUserAPI(email: string) {
 
 export async function accessAdminPageAPI() {
   try {
-    const res = await api.get("admin/access");
+    const res = await api.get("/admin/access");
     return res.data;
   }catch (err : any) {
     return null;

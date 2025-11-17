@@ -36,7 +36,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		accessCookie,
 		int((time.Minute * 15).Seconds()),
 		"/",
-		"localhost",
+		"chord-viewer.onrender.com",
 		true,
 		true,
 	)
@@ -46,7 +46,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		refreshCookie,
 		int((time.Hour * 24 * 14).Seconds()),
 		"/",
-		"localhost",
+		"chord-viewer.onrender.com",
 		true,
 		true,
 	)
