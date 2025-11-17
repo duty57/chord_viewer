@@ -39,7 +39,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		MaxAge:   int((time.Minute * 15).Seconds()),
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(c.Writer, &accessCookie)
 
@@ -51,7 +51,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		MaxAge:   int((time.Hour * 24 * 14).Seconds()),
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(c.Writer, &refreshCookie)
 
