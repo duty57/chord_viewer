@@ -3,9 +3,30 @@ import axios from "axios";
 
 export const api = axios.create({
   baseURL: "https://chord-viewer.onrender.com/api",
-  withCredentials: true,
 });
 
+// Add token to every request
+api.interceptors.request.use(
+  async (config) => {
+    const user = auth.currentUser
+    if (user) {
+      try {
+        const token = await user.getIdToken(true) // Force refresh
+        config.headers.Authorization = `Bearer ${token}`
+      } catch (error) {
+        console.error('Failed to get token:', error)
+        throw error
+      }
+    } else {
+      // If no user, reject the request
+      throw new Error('No authenticated user')
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 let isRefreshing = false;
 let failedQueue: any[] = [];

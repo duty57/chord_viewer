@@ -13,7 +13,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  base: "/chord_viewer/",
+  base: "/",
   server: {
     proxy: {
       "/api" : "https://chord-viewer.onrender.com/api"

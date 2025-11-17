@@ -6,7 +6,6 @@ import (
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
 
 func GetAuthHeader(c *gin.Context) (string, bool) {
@@ -18,73 +17,6 @@ func GetAuthHeader(c *gin.Context) (string, bool) {
 
 	idToken = idToken[7:]
 	return idToken, true
-}
-
-func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) error {
-	accessCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Minute*15)
-	if err != nil {
-		return err
-	}
-
-	refreshCookie, err := authClient.SessionCookie(context.Background(), idToken, time.Hour*24*14)
-	if err != nil {
-		return err
-	}
-
-	c.SetCookie(
-		"access_token",
-		accessCookie,
-		int((time.Minute * 15).Seconds()),
-		"/",
-		"", // Empty domain allows cross-origin
-		true,
-		true,
-	)
-
-	c.SetCookie(
-		"refresh_token",
-		refreshCookie,
-		int((time.Hour * 24 * 14).Seconds()),
-		"/",
-		"", // Empty domain allows cross-origin
-		true,
-		true,
-	)
-
-	return nil
-}
-
-func VerifyAccessToken(c *gin.Context, authClient *auth.Client) (*auth.Token, error) {
-	cookie, err := c.Cookie("access_token")
-	if err != nil {
-		return nil, err
-	}
-
-	token, err := authClient.VerifySessionCookie(context.Background(), cookie)
-	if err != nil {
-		return nil, err
-	}
-
-	return token, nil
-}
-
-func VerifyRefreshToken(c *gin.Context, authClient *auth.Client) (*auth.Token, error) {
-	cookie, err := c.Cookie("refresh_token")
-	if err != nil {
-		return nil, err
-	}
-
-	token, err := authClient.VerifySessionCookie(context.Background(), cookie)
-	if err != nil {
-		return nil, err
-	}
-
-	return token, nil
-}
-
-func ClearSession(c *gin.Context) {
-	c.SetCookie("access_token", "", -1, "/", "", true, true)
-	c.SetCookie("refresh_token", "", -1, "/", "", true, true)
 }
 
 func AuthMiddleware(authClient *auth.Client) gin.HandlerFunc {
@@ -108,15 +40,17 @@ func AuthMiddleware(authClient *auth.Client) gin.HandlerFunc {
 
 func AdminMiddleware(authClient *auth.Client, firestoreClient *firestore.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// First verify authentication
-		token, err := VerifyAccessToken(c, authClient)
+		// Check Authorization header
+		idToken, success := GetAuthHeader(c)
+		if !success {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid Authorization header"})
+			return
+		}
+
+		token, err := authClient.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			token, err = VerifyRefreshToken(c, authClient)
-			if err != nil {
-				ClearSession(c)
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Session expired, please login again"})
-				return
-			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			return
 		}
 
 		// Check if user is admin
