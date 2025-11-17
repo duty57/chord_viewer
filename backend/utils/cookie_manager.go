@@ -36,7 +36,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		accessCookie,
 		int((time.Minute * 15).Seconds()),
 		"/",
-		"chord-viewer.onrender.com",
+		"", // Empty domain allows cross-origin
 		true,
 		true,
 	)
@@ -46,7 +46,7 @@ func CreateSession(c *gin.Context, authClient *auth.Client, idToken string) erro
 		refreshCookie,
 		int((time.Hour * 24 * 14).Seconds()),
 		"/",
-		"chord-viewer.onrender.com",
+		"", // Empty domain allows cross-origin
 		true,
 		true,
 	)
@@ -83,8 +83,8 @@ func VerifyRefreshToken(c *gin.Context, authClient *auth.Client) (*auth.Token, e
 }
 
 func ClearSession(c *gin.Context) {
-	c.SetCookie("access_token", "", -1, "/", "localhost", true, true)
-	c.SetCookie("refresh_token", "", -1, "/", "localhost", true, true)
+	c.SetCookie("access_token", "", -1, "/", "", true, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", true, true)
 }
 
 func AuthMiddleware(authClient *auth.Client) gin.HandlerFunc {
