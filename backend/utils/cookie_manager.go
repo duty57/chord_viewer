@@ -95,7 +95,7 @@ func ClearSession(c *gin.Context) {
 		MaxAge:   -1,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(c.Writer, &accessCookie)
 
@@ -107,7 +107,7 @@ func ClearSession(c *gin.Context) {
 		MaxAge:   -1,
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(c.Writer, &refreshCookie)
 }
