@@ -9,7 +9,7 @@ const visibleNotes = computed(() =>
 );
 
 const progress = reactive<Record<string, number>>({
-  'C': 423,
+  'C': 0,
   'D': 0,
   'E': 0,
   'F': 0,
@@ -51,7 +51,7 @@ watch(
 
 <template>
   <Menu></Menu>
-  <div class="content">
+  <main class="content">
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
         <label class="note-label">{{ note.label }}</label>
@@ -62,7 +62,7 @@ watch(
               :style="{backgroundColor: note.color, width: (progress[note.label] ?? 0)/ note.maxAmount * 100 + '%'}"></span>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>

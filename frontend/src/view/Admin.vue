@@ -140,7 +140,7 @@ onMounted(async () => {
 
 <template>
   <Menu></Menu>
-  <div class="content">
+  <main class="content">
     <StatsCard title="Amount of users registered" :value="userCount || 0"></StatsCard>
     <Divider></Divider>
     <h1>Users</h1>
@@ -214,7 +214,7 @@ onMounted(async () => {
         </svg>
       </button>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>

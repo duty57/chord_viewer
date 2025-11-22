@@ -16,7 +16,7 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
 
 <template>
   <Menu></Menu>
-  <div class="content">
+  <main class="content">
     <h1>Statistics</h1>
     <div class="stats">
       <StatsCard title="Chords learned" :value="userInstance.learnedChords.size"></StatsCard>
@@ -29,7 +29,7 @@ const latestLearnedChord = computed(() => new Set([...userInstance.learnedChords
         <button v-for="chord in latestLearnedChord" class="card-btn chord-card" @click="navigateToChord(router, chord)">{{chord.replace('_', '#').replace('-', '/')}}</button>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
