@@ -51,7 +51,7 @@ watch(
 
 <template>
   <Menu></Menu>
-  <main class="content">
+  <div class="content">
     <div class="progress-panel" v-for="note in visibleNotes" :key="note.label">
       <div class="progress-info">
         <label class="note-label">{{ note.label }}</label>
@@ -62,7 +62,7 @@ watch(
               :style="{backgroundColor: note.color, width: (progress[note.label] ?? 0)/ note.maxAmount * 100 + '%'}"></span>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>

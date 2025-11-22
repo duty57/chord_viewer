@@ -145,7 +145,7 @@ const filteredCompounds = computed(() => {
 
 <template>
   <Menu></Menu>
-  <main class="content">
+  <div class="content">
     <div class="fret-numeration" :style="{gridTemplateColumns: generateColumns()}">
       <label v-for="n in columns" :key="'num-'+n" class="cell num">{{ n }}</label>
     </div>
@@ -181,7 +181,7 @@ const filteredCompounds = computed(() => {
         </svg>
       </button>
     </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>

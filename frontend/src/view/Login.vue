@@ -174,7 +174,7 @@ onMounted(() => {
 
 
 <template>
-  <main class="content">
+  <div class="content">
     <div class="card">
       <div class="header">
         <h1>Login</h1>
@@ -215,7 +215,7 @@ onMounted(() => {
         Continue with Google
       </button>
     </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>

@@ -13,7 +13,7 @@ const favouriteChords = userInstance.favouriteChords;
 
 <template>
   <Menu></Menu>
-  <main class="content">
+  <div class="content">
     <h1 class="page-label">My Favourite Tabs</h1>
     <Divider></Divider>
     <div class="chords">
@@ -22,7 +22,7 @@ const favouriteChords = userInstance.favouriteChords;
         <DeleteButton class="trash-btn" @click="removeFromFavourite(favouriteChords, favChord)"></DeleteButton>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>
