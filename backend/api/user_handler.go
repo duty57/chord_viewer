@@ -57,6 +57,7 @@ func RegisterRoutes(router *gin.Engine) {
 			protected.DELETE("/learnedChord", deleteLearnedChordHandler)
 			protected.GET("/chord", chordHandler)
 			protected.PUT("/profile-picture", updateProfilePictureHandler)
+			protected.POST("/chord/comment", addChordCommentHandler)
 		}
 
 		admin := api.Group("/admin").Use(utils.AdminMiddleware(authClient, firestoreClient))

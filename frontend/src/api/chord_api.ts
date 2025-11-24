@@ -57,3 +57,14 @@ export async function getChordPosition(chord: string) {
     return null;
   }
 }
+
+export async function addChordCommentAPI(comment: string) {
+  try {
+    const res = await api.post("/chord/comment", {
+      data: {comment}
+    });
+    return res.data;
+  }catch (err: any) {
+    return null
+  }
+}

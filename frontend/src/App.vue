@@ -20,9 +20,9 @@ onMounted( async () => {
 
 <template>
 
-  <main class="theme-wrapper">
+  <div class="theme-wrapper">
     <router-view></router-view>
-  </main>
+  </div>
 </template>
 
 <style scoped>

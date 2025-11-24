@@ -208,3 +208,41 @@ func chordHandler(c *gin.Context) {
 	})
 
 }
+
+func addChordCommentHandler(c *gin.Context) {
+	tokenInterface, exists := c.Get("user_token")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	token := tokenInterface.(*auth.Token)
+
+	//get the chord
+	type RequestBody struct {
+		ChordComment string `json:"chordComment"`
+	}
+	var req RequestBody
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
+		return
+	}
+
+	//add chord to the firestore
+	docRef := firestoreClient.Collection("users").Doc(token.UID)
+	_, err := docRef.Update(context.Background(), []firestore.Update{
+		{
+			Path:  "ChordComments",
+			Value: firestore.ArrayUnion(req.ChordComment),
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Chord added to learned",
+		"uid":     token.UID,
+		"comment": req.ChordComment,
+	})
+}
